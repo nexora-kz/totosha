@@ -82,7 +82,7 @@ jobs:
         working-directory: site
         run: npm run build
 
-            - name: Commit release to TOTOSHA
+      - name: Commit release to TOTOSHA
         working-directory: site
         run: |
           rm -rf node_modules .next
@@ -100,5 +100,7 @@ jobs:
           fi
 
           git add .
+
           git commit -m "TOTOSHA release ${{ steps.release.outputs.version }}"
+
           git push
