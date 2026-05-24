@@ -47,3 +47,351 @@ button[data-download],
 .downloads-section {
   display: none !important;
 }
+
+
+/* TOTOSHA media test */
+.media-page{min-height:100vh;background:#fffaf1;color:#101828;padding:32px;font-family:inherit}.media-hero{max-width:1180px;margin:0 auto 28px;background:linear-gradient(135deg,#fff,#fff3df);border:1px solid #f4dec0;border-radius:34px;padding:42px;box-shadow:0 24px 70px rgba(26,20,10,.08)}.media-back{display:inline-flex;margin-bottom:22px;background:#111827;color:white;padding:12px 18px;border-radius:18px;font-weight:900;text-decoration:none}.media-hero h1{font-size:54px;line-height:1.05;margin:12px 0}.media-hero p{max-width:820px;color:#667085;font-size:18px;line-height:1.7}.media-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}.media-stats div{background:white;border:1px solid #f1dfc2;border-radius:24px;padding:20px}.media-stats b{display:block;font-size:30px}.media-stats span{color:#667085;font-weight:800}.media-filters,.media-year{max-width:1180px;margin:0 auto 28px;background:white;border:1px solid #f1dfc2;border-radius:30px;padding:28px;box-shadow:0 18px 48px rgba(26,20,10,.06)}.media-filters{display:grid;grid-template-columns:1fr 2fr;gap:22px}.media-pills{display:flex;flex-wrap:wrap;gap:10px}.media-pills a,.media-pills span{background:#fff2df;color:#f97316;border-radius:999px;padding:9px 13px;font-weight:900;text-decoration:none}.media-year-title{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f1dfc2;padding-bottom:18px;margin-bottom:24px}.media-year-title h2{font-size:38px;margin:6px 0}.media-year-title>span{background:#111827;color:white;border-radius:999px;padding:10px 14px;font-weight:900}.media-event{margin-top:26px}.media-event h3{font-size:26px;margin:0 0 16px}.media-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.media-card{position:relative;margin:0;background:#fffaf1;border:1px solid #f1dfc2;border-radius:24px;overflow:hidden;box-shadow:0 12px 34px rgba(26,20,10,.07)}.media-card img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;-webkit-user-drag:none;user-select:none}.media-card figcaption{padding:14px}.media-card figcaption b{display:block;font-size:14px}.media-card figcaption span{display:block;margin-top:5px;color:#667085;font-size:12px;font-weight:800}.media-card:after{content:"Тотоша";position:absolute;right:10px;top:10px;background:rgba(255,255,255,.75);backdrop-filter:blur(8px);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:950;color:#101828;pointer-events:none}img{-webkit-user-drag:none;user-select:none}a[href$=".csv"],a[href$=".json"],.download-button,.downloads{display:none!important}@media(max-width:900px){.media-page{padding:14px}.media-hero{padding:26px}.media-hero h1{font-size:38px}.media-stats,.media-filters,.media-grid{grid-template-columns:1fr}.media-year-title{align-items:flex-start;gap:10px;flex-direction:column}}
+
+
+/* TOTOSHA Media System Final */
+.media-page {
+  min-height: 100vh;
+  background: #fffaf1;
+  color: #111827;
+  padding: 44px 5vw 80px;
+}
+.media-back {
+  display: inline-flex;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: white;
+  border: 1px solid #f0dfc2;
+  font-weight: 900;
+  text-decoration: none;
+  color: #111827;
+}
+.media-hero {
+  max-width: 1180px;
+  margin: 0 auto 36px;
+  padding: 42px;
+  border-radius: 34px;
+  background: linear-gradient(135deg, #fff, #fff3df);
+  box-shadow: 0 24px 70px rgba(44, 31, 12, .08);
+  border: 1px solid #f0dfc2;
+}
+.media-hero h1 {
+  margin: 12px 0;
+  font-size: clamp(38px, 6vw, 72px);
+  line-height: .98;
+  letter-spacing: -0.05em;
+}
+.media-hero p {
+  max-width: 760px;
+  color: #667085;
+  font-size: 18px;
+  line-height: 1.7;
+}
+.media-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 14px;
+  margin-top: 28px;
+}
+.media-stats div {
+  background: rgba(255,255,255,.82);
+  border: 1px solid #f0dfc2;
+  border-radius: 22px;
+  padding: 18px;
+}
+.media-stats b {
+  display: block;
+  font-size: 28px;
+}
+.media-stats span {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+  font-weight: 800;
+}
+.media-filters,
+.media-year {
+  max-width: 1180px;
+  margin: 0 auto 34px;
+}
+.media-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.media-pills a {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: white;
+  border: 1px solid #f0dfc2;
+  color: #111827;
+  font-weight: 900;
+  text-decoration: none;
+}
+.media-year h2 {
+  font-size: 40px;
+  margin-top: 44px;
+}
+.media-event {
+  margin-top: 28px;
+}
+.media-event h3 {
+  font-size: 28px;
+  margin-bottom: 6px;
+}
+.media-event p {
+  color: #667085;
+  margin-top: 0;
+}
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap: 18px;
+}
+.media-card {
+  background: white;
+  border: 1px solid #f0dfc2;
+  border-radius: 24px;
+  padding: 10px;
+  overflow: hidden;
+  box-shadow: 0 16px 42px rgba(44,31,12,.06);
+}
+.photo-protected {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #f3eadb;
+}
+.photo-protected img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.watermark {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.74);
+  color: rgba(17,24,39,.78);
+  font-size: 12px;
+  font-weight: 950;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+}
+.media-meta {
+  padding: 12px 4px 4px;
+}
+.media-meta b,
+.media-meta span,
+.media-meta small {
+  display: block;
+}
+.media-meta span {
+  color: #667085;
+  margin-top: 5px;
+}
+.media-meta small {
+  color: #98a2b3;
+  margin-top: 5px;
+}
+a[href$=".csv"],
+a[href$=".json"],
+.download-button,
+.downloads,
+.downloads-section {
+  display: none !important;
+}
+@media (max-width: 800px) {
+  .media-page { padding: 24px 16px 60px; }
+  .media-hero { padding: 26px; }
+  .media-stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+}
+
+
+/* TOTOSHA Media v26 layout fix */
+.media-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+  gap: 22px !important;
+  align-items: start !important;
+}
+
+.media-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  border-radius: 24px !important;
+}
+
+.photo-protected {
+  width: 100% !important;
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+  display: block !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border-radius: 18px !important;
+  background: #f3eadb !important;
+  flex: 0 0 auto !important;
+}
+
+.photo-protected img {
+  display: block !important;
+  width: 100% !important;
+  height: 220px !important;
+  min-height: 220px !important;
+  max-height: 220px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+}
+
+.media-meta {
+  width: 100% !important;
+  min-height: 86px !important;
+  height: auto !important;
+  display: block !important;
+  padding: 12px 4px 4px !important;
+  background: transparent !important;
+}
+
+.media-meta b,
+.media-meta span,
+.media-meta small {
+  display: block !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+}
+
+.media-card:empty,
+.media-grid > :empty {
+  display: none !important;
+}
+
+/* prevent accidental old pseudo-watermark bars from previous versions */
+.media-card::after,
+.gallery-card::after,
+.photo-card::after,
+.protected-photo-wrap::after {
+  display: none !important;
+  content: none !important;
+}
+
+
+/* TOTOSHA v27 media entry points */
+.media-teaser {
+  max-width: 1380px;
+  margin: 60px auto;
+  padding: 54px;
+  border-radius: 34px;
+  background: linear-gradient(135deg, #fff, #fff3df);
+  border: 1px solid #f0dfc2;
+  box-shadow: 0 24px 70px rgba(44,31,12,.08);
+  display: grid;
+  grid-template-columns: 1.35fr .65fr;
+  gap: 28px;
+  align-items: center;
+}
+.media-teaser h2 {
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  margin: 12px 0 18px;
+  color: #111827;
+}
+.media-teaser p {
+  color: #667085;
+  font-size: 18px;
+  line-height: 1.7;
+  max-width: 760px;
+}
+.media-teaser__cards {
+  display: grid;
+  gap: 14px;
+}
+.media-teaser__cards div {
+  background: rgba(255,255,255,.86);
+  border: 1px solid #f0dfc2;
+  border-radius: 24px;
+  padding: 22px;
+}
+.media-teaser__cards b {
+  display: block;
+  font-size: 34px;
+  color: #111827;
+}
+.media-teaser__cards span {
+  display: block;
+  color: #667085;
+  font-weight: 800;
+  margin-top: 4px;
+}
+@media (max-width: 900px) {
+  .media-teaser {
+    margin: 36px 16px;
+    padding: 28px;
+    grid-template-columns: 1fr;
+  }
+}
+
+/* TOTOSHA v28 premium life gallery */
+.life-page{min-height:100vh;background:radial-gradient(circle at 20% 0%,#fff2da 0,transparent 28%),#fffaf1;color:#111827;padding:44px 5vw 80px}.life-back{display:inline-flex;margin-bottom:24px;padding:12px 18px;border-radius:999px;background:white;border:1px solid #f0dfc2;font-weight:950;text-decoration:none;color:#111827}.life-hero,.life-latest,.life-years,.life-year{max-width:1380px;margin-left:auto;margin-right:auto}.life-hero{padding:48px;border-radius:38px;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(255,242,218,.92));border:1px solid #f0dfc2;box-shadow:0 30px 80px rgba(44,31,12,.08)}.life-hero h1{margin:12px 0 16px;font-size:clamp(54px,8vw,112px);line-height:.88;letter-spacing:-.07em}.life-hero p{max-width:850px;color:#667085;font-size:20px;line-height:1.75}.life-hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:24px;margin-top:34px}.life-feature{min-height:360px;position:relative;overflow:hidden;border-radius:32px;background:#111827}.life-feature img{width:100%;height:100%;object-fit:cover;display:block;opacity:.78;-webkit-user-drag:none;user-select:none}.life-feature>div{position:absolute;left:28px;right:28px;bottom:26px;color:white}.life-feature span{display:inline-flex;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.22);backdrop-filter:blur(10px);font-weight:900;margin-bottom:12px}.life-feature b{display:block;font-size:clamp(28px,4vw,52px);line-height:1;letter-spacing:-.04em}.life-stats{display:grid;gap:14px}.life-stats div,.life-years{background:rgba(255,255,255,.88);border:1px solid #f0dfc2;border-radius:26px;padding:22px}.life-stats b{display:block;font-size:40px}.life-stats span{display:block;color:#667085;font-weight:900;margin-top:4px}.life-latest{margin-top:44px;padding:36px;border-radius:34px;background:white;border:1px solid #f0dfc2}.section-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-end;margin-bottom:24px}.section-head h2,.life-years h2{font-size:clamp(32px,5vw,56px);margin:8px 0 0;letter-spacing:-.05em}.section-head a{color:#ff6b14;font-weight:950;text-decoration:none}.latest-strip{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:16px}.latest-card{position:relative;min-height:240px;overflow:hidden;border-radius:26px;background:#111827;color:white;text-decoration:none}.latest-card img{width:100%;height:100%;object-fit:cover;opacity:.82;display:block}.latest-card span{position:absolute;left:18px;bottom:16px;right:18px;font-size:22px;font-weight:950}.life-years{margin-top:44px;display:flex;justify-content:space-between;gap:18px;align-items:center}.life-pills{display:flex;flex-wrap:wrap;gap:10px}.life-pills a{padding:12px 16px;border-radius:999px;border:1px solid #f0dfc2;background:#fffaf1;color:#111827;text-decoration:none;font-weight:950}.life-year{margin-top:44px}.life-year-title{display:flex;align-items:baseline;justify-content:space-between;padding:0 10px 18px}.life-year-title span{font-size:clamp(42px,7vw,82px);font-weight:950;letter-spacing:-.06em}.life-year-title small{color:#667085;font-weight:900}.event-showcase{margin:0 0 48px;padding:24px;border-radius:38px;background:rgba(255,255,255,.92);border:1px solid #f0dfc2;box-shadow:0 24px 70px rgba(44,31,12,.06)}.event-cover{min-height:460px;position:relative;border-radius:30px;overflow:hidden;background:#111827}.event-cover img{width:100%;height:100%;min-height:460px;object-fit:cover;display:block;opacity:.74}.event-cover-overlay{position:absolute;left:34px;bottom:32px;max-width:780px;color:white}.event-cover-overlay span{font-size:46px}.event-cover-overlay h3{margin:10px 0;font-size:clamp(38px,6vw,76px);line-height:.95;letter-spacing:-.06em}.event-cover-overlay p{font-size:20px;line-height:1.55;color:rgba(255,255,255,.9)}.event-cover-overlay small{display:inline-flex;margin-top:8px;padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.2);backdrop-filter:blur(8px);font-weight:900}.event-gallery{columns:4 240px;column-gap:16px;margin-top:18px}.event-photo{position:relative;break-inside:avoid;margin-bottom:16px;border-radius:24px;overflow:hidden;background:#f3eadb;border:1px solid #f0dfc2}.event-photo img{width:100%;height:auto;min-height:210px;object-fit:cover;display:block;-webkit-user-drag:none;user-select:none}.event-photo-0 img,.event-photo-4 img{aspect-ratio:4/5}.event-photo-1 img,.event-photo-5 img{aspect-ratio:1/1}.event-photo-2 img,.event-photo-6 img{aspect-ratio:5/4}.home-life{max-width:1380px;margin:64px auto;padding:54px;border-radius:38px;background:linear-gradient(135deg,#fff,#fff3df);border:1px solid #f0dfc2;box-shadow:0 30px 80px rgba(44,31,12,.08);display:grid;grid-template-columns:.95fr 1.05fr;gap:34px;align-items:center}.home-life h2{font-size:clamp(38px,6vw,72px);line-height:.96;letter-spacing:-.06em;margin:12px 0 18px}.home-life p{color:#667085;font-size:19px;line-height:1.7;margin-bottom:22px}.home-life__photos{display:grid;grid-template-columns:1fr 1fr;gap:14px}.home-life__photos img{width:100%;height:230px;object-fit:cover;border-radius:24px;border:1px solid #f0dfc2;box-shadow:0 18px 45px rgba(44,31,12,.08)}.home-life__photos img:first-child{grid-row:span 2;height:474px}@media(max-width:900px){.life-page{padding:24px 16px 60px}.life-hero{padding:28px}.life-hero-grid,.home-life{grid-template-columns:1fr}.life-feature,.event-cover,.event-cover img{min-height:320px}.life-years,.section-head{align-items:flex-start;flex-direction:column}.latest-strip{grid-template-columns:1fr}.event-gallery{columns:2 150px}.home-life{margin:36px 16px;padding:28px}.home-life__photos img,.home-life__photos img:first-child{height:220px;grid-row:auto}}
+
+
+/* TOTOSHA v29 build/version badge */
+.version-badge {
+  position: fixed;
+  top: 92px;
+  right: 18px;
+  z-index: 9999;
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(17, 24, 39, 0.88);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 18px 45px rgba(17,24,39,.18);
+  backdrop-filter: blur(10px);
+  font-size: 11px;
+  line-height: 1.15;
+  pointer-events: none;
+}
+.version-badge strong {
+  font-size: 12px;
+  letter-spacing: .02em;
+}
+.version-badge span {
+  color: rgba(255,255,255,.72);
+}
+.version-badge em {
+  color: #7CFFB2;
+  font-style: normal;
+  font-weight: 900;
+}
+@media (max-width: 900px) {
+  .version-badge {
+    top: auto;
+    right: 12px;
+    bottom: 86px;
+    transform: scale(.92);
+    transform-origin: bottom right;
+  }
+}
