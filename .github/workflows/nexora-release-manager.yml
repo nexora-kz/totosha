@@ -59,18 +59,27 @@ jobs:
 
       - name: Extract release ZIP
         run: |
+          rm -rf /tmp/nexora-release
           mkdir -p /tmp/nexora-release
           unzip "${{ steps.release.outputs.dir }}/${{ steps.release.outputs.source }}" -d /tmp/nexora-release
           ls -la /tmp/nexora-release
 
       - name: Apply release to TOTOSHA
         run: |
-          rsync -a \
+          if [ -d "/tmp/nexora-release/totosha-main" ]; then
+            SOURCE="/tmp/nexora-release/totosha-main/"
+          else
+            SOURCE="/tmp/nexora-release/"
+          fi
+
+          echo "Using release source: $SOURCE"
+
+          rsync -a --delete \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='node_modules' \
             --exclude='.next' \
-            /tmp/nexora-release/ site/
+            "$SOURCE" site/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
