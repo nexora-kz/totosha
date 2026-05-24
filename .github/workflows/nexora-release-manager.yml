@@ -1,0 +1,48 @@
+name: NEXORA Release Manager
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout TOTOSHA
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js
+        run: npm run build
+
+      - name: Check important production URLs
+        run: |
+          echo "Checking production pages..."
+          curl -I https://totosha.vercel.app
+          curl -I https://totosha.vercel.app/media-test
+
+      - name: Lighthouse check
+        uses: treosh/lighthouse-ci-action@v12
+        with:
+          urls: |
+            https://totosha.vercel.app
+            https://totosha.vercel.app/media-test
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+          configPath: ./.github/lighthouse/lighthouserc.json
+
+      - name: Broken links check
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress https://totosha.vercel.app https://totosha.vercel.app/media-test
