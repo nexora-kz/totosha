@@ -293,3 +293,60 @@ a[href$=".json"],
   display: none !important;
   content: none !important;
 }
+
+
+/* TOTOSHA v27 media entry points */
+.media-teaser {
+  max-width: 1380px;
+  margin: 60px auto;
+  padding: 54px;
+  border-radius: 34px;
+  background: linear-gradient(135deg, #fff, #fff3df);
+  border: 1px solid #f0dfc2;
+  box-shadow: 0 24px 70px rgba(44,31,12,.08);
+  display: grid;
+  grid-template-columns: 1.35fr .65fr;
+  gap: 28px;
+  align-items: center;
+}
+.media-teaser h2 {
+  font-size: clamp(34px, 5vw, 56px);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  margin: 12px 0 18px;
+  color: #111827;
+}
+.media-teaser p {
+  color: #667085;
+  font-size: 18px;
+  line-height: 1.7;
+  max-width: 760px;
+}
+.media-teaser__cards {
+  display: grid;
+  gap: 14px;
+}
+.media-teaser__cards div {
+  background: rgba(255,255,255,.86);
+  border: 1px solid #f0dfc2;
+  border-radius: 24px;
+  padding: 22px;
+}
+.media-teaser__cards b {
+  display: block;
+  font-size: 34px;
+  color: #111827;
+}
+.media-teaser__cards span {
+  display: block;
+  color: #667085;
+  font-weight: 800;
+  margin-top: 4px;
+}
+@media (max-width: 900px) {
+  .media-teaser {
+    margin: 36px 16px;
+    padding: 28px;
+    grid-template-columns: 1fr;
+  }
+}

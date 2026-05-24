@@ -52,4 +52,22 @@ function LifeTrust(){return <section className="section white"><div className="c
 function SEOBlock(){return <section className="section"><div className="container"><SectionTitle eyebrow="Для поиска" title="Детский сад Тотоша в Астане"/><p className="seo-text">Тотоша — частный детский сад в Астане с современным подходом к развитию детей. В детском саду предусмотрены онлайн видеонаблюдение, врач-педиатр, логопед, Английский язык, вокал, хореография, таэквондо, подготовка к школе, фотоотчёты, Цифровой кабинет, группы на полдня и полный день. Время работы: 07:30–19:00.</p></div></section>}
 function Home({setPage}:{setPage:(p:Page)=>void}){return <><Hero setPage={setPage}/><Why/><Safety/><Directions/><Day/><Development/><Parents/><Cabinet/><LifeTrust/><SEOBlock/><section className="section white"><div className="container split"><div><SectionTitle eyebrow="Первое знакомство" title="Путь семьи в Тотоша" text="Заявка → экскурсия → знакомство с пространством → адаптация → комфортное посещение → развитие ребёнка."/><Btn onClick={()=>wa('Здравствуйте. Хочу записаться на экскурсию в Тотоша.')}>Записаться в WhatsApp</Btn></div><LeadForm title="Записаться на экскурсию" intent="Хочу записаться на экскурсию в Тотоша"/></div></section></>}
 function Footer({setPage}:{setPage:(p:Page)=>void}){return <footer className="footer"><div className="container footer-row"><div><div className="brand-title">Тотоша</div><div className="brand-sub">Детский сад нового поколения. Powered by NEXORA.</div></div><div className="hero-actions" style={{marginTop:0}}><Btn kind="light" onClick={()=>wa('Здравствуйте. Хочу узнать подробнее про Тотоша.')}>WhatsApp</Btn><Btn kind="light" onClick={()=>ext(INSTAGRAM_URL)}>Instagram</Btn><Btn kind="light" onClick={()=>setPage('cabinet')}>Цифровой кабинет</Btn></div></div></footer>}
-export default function App(){const [page,setPage]=useState<Page>('home'); const current={home:<Home setPage={setPage}/>,about:<AboutPage/>,programs:<ProgramsPage/>,parents:<ParentsPage/>,cabinet:<Cabinet/>,franchise:<Franchise/>,contacts:<Contacts/>}[page]; return <div className="page"><Header page={page} setPage={setPage}/><main>{current}</main><Footer setPage={setPage}/><div className="floating"><button className="float-btn float-whatsapp" onClick={()=>wa('Здравствуйте. Хочу узнать подробнее про Тотоша.')}><MessageCircle/></button><button className="float-btn float-top" onClick={top}><ArrowUp/></button></div></div>}
+export default function App(){const [page,setPage]=useState<Page>('home'); const current={home:<Home setPage={setPage}/>,about:<AboutPage/>,programs:<ProgramsPage/>,parents:<ParentsPage/>,cabinet:<Cabinet/>,franchise:<Franchise/>,contacts:<Contacts/>}[page]; return <div className="page"><Header page={page} setPage={setPage}/><main>{current}
+      <section id="life" className="media-teaser">
+        <div className="media-teaser__content">
+          <div className="eyebrow">Жизнь Тотоша</div>
+          <h2>Фотоархив мероприятий, занятий и счастливых моментов</h2>
+          <p>
+            Новый год, 8 Марта, Наурыз, выпускные, занятия и повседневная жизнь детского сада —
+            всё собрано в отдельном защищённом медиаразделе.
+          </p>
+          <a className="btn btn-primary" href="/media-test">Открыть фотоархив</a>
+        </div>
+        <div className="media-teaser__cards">
+          <div><b>120</b><span>фото в тесте</span></div>
+          <div><b>5</b><span>лет архива</span></div>
+          <div><b>18</b><span>событий</span></div>
+        </div>
+      </section>
+
+      </main><Footer setPage={setPage}/><div className="floating"><button className="float-btn float-whatsapp" onClick={()=>wa('Здравствуйте. Хочу узнать подробнее про Тотоша.')}><MessageCircle/></button><button className="float-btn float-top" onClick={top}><ArrowUp/></button></div></div>}
