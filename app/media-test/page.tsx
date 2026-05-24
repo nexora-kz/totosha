@@ -13,116 +13,61 @@ type MediaItem = {
   description?:string
 }
 
-function readCatalog(): MediaItem[] {
-  try {
-    const filePath = path.join(process.cwd(), 'public', 'totosha-media', 'catalog.json')
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'))
-  } catch {
-    return []
-  }
+export default function MediaTestPage(){
+
+let catalog:MediaItem[]=[]
+
+try{
+  const filePath=path.join(process.cwd(),'public','totosha-media','catalog.json')
+  catalog=JSON.parse(fs.readFileSync(filePath,'utf8'))
+}catch{
+  catalog=[]
 }
 
-function timeOf(item: MediaItem) {
-  const raw = item.date || ''
-  const time = new Date(raw).getTime()
-  return Number.isFinite(time) ? time : 0
-}
+const years=[...new Set(catalog.map(x=>x.year))].sort()
+const march8Count=catalog.filter(x=>String(x.event).includes('8 Марта')).length
 
-function latestTime(items: MediaItem[]) {
-  return Math.max(...items.map(timeOf), 0)
-}
+return(
+<main style={{padding:'40px',maxWidth:'1400px',margin:'0 auto'}}>
+  <a href="/" style={{display:'inline-block',marginBottom:'20px',fontWeight:800}}>← На сайт Тотоша</a>
+  <h1>Медиа Тотоша</h1>
+  <p>Фото подключены отдельным разделом и не ломают основной сайт.</p>
+  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:'16px',margin:'24px 0'}}>
+    <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'18px',padding:'18px'}}><b>{catalog.length}</b><br/>фото в тесте</div>
+    <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'18px',padding:'18px'}}><b>{years.length}</b><br/>года</div>
+    <div style={{background:'#fff',border:'1px solid #eee',borderRadius:'18px',padding:'18px'}}><b>{march8Count}</b><br/>8 Марта</div>
+  </div>
 
-export default function MediaTestPage() {
-  const catalog = readCatalog()
-    .map((item) => ({
-      ...item,
-      event: item.event && !item.event.toLowerCase().includes('не определ') ? item.event : 'Повседневная жизнь Тотоша',
-      category: item.category && !item.category.toLowerCase().includes('не определ') ? item.category : 'Жизнь детского сада',
-      group: item.group && !item.group.toLowerCase().includes('не определ') ? item.group : 'Группа уточняется',
-    }))
-    .sort((a, b) => timeOf(b) - timeOf(a))
-
-  const years = [...new Set(catalog.map((x) => x.year || 'Год уточняется'))]
-    .sort((a, b) => {
-      const numA = Number(a)
-      const numB = Number(b)
-      if (Number.isFinite(numA) && Number.isFinite(numB)) return numB - numA
-      return String(b).localeCompare(String(a), 'ru')
-    })
-
-  const eventCount = new Set(catalog.map((x) => x.event)).size
-  const march8Count = catalog.filter((x) => x.event.includes('8 Марта')).length
-
-  return (
-    <main className="media-page">
-      <section className="media-hero">
-        <a className="media-back" href="/">← На сайт Тотоша</a>
-        <div className="eyebrow">Медиаархив Тотоша</div>
-        <h1>Жизнь Тотоша</h1>
-        <p>
-          Самые свежие фотографии отображаются первыми. Архив сгруппирован по годам,
-          событиям и направлениям, не затрагивая структуру основного сайта.
-        </p>
-        <div className="media-stats">
-          <div><b>{catalog.length}</b><span>фото в тесте</span></div>
-          <div><b>{years.length}</b><span>года</span></div>
-          <div><b>{eventCount}</b><span>событий</span></div>
-          <div><b>{march8Count}</b><span>8 Марта</span></div>
-        </div>
-      </section>
-
-      <section className="media-filters">
-        <h2>Годы</h2>
-        <div className="media-pills">
-          {years.map((year) => <a key={year} href={`#year-${year}`}>{year}</a>)}
-        </div>
-      </section>
-
-      {years.map((year) => {
-        const yearItems = catalog.filter((x) => (x.year || 'Год уточняется') === year)
-
-        const events = [...new Set(yearItems.map((x) => x.event))]
-          .sort((a, b) => {
-            const aItems = yearItems.filter((x) => x.event === a)
-            const bItems = yearItems.filter((x) => x.event === b)
-            return latestTime(bItems) - latestTime(aItems)
-          })
-
-        return (
-          <section className="media-year" id={`year-${year}`} key={year}>
-            <h2>{year}</h2>
-            {events.map((event) => {
-              const items = yearItems
-                .filter((x) => x.event === event)
-                .sort((a, b) => timeOf(b) - timeOf(a))
-
-              const description = items[0]?.description
-
-              return (
-                <div className="media-event" key={event}>
-                  <h3>{event}</h3>
-                  {description && <p>{description}</p>}
-                  <div className="media-grid">
-                    {items.map((item) => (
-                      <article className="media-card" key={item.id}>
-                        <div className="photo-protected">
-                          <img src={item.src} alt={item.event} draggable={false} />
-                          <span className="watermark">Тотоша</span>
-                        </div>
-                        <div className="media-meta">
-                          <b>{item.event}</b>
-                          <span>{item.group || 'Группа уточняется'}</span>
-                          <small>{item.date || item.category}</small>
-                        </div>
-                      </article>
-                    ))}
+  {years.map(year=>{
+    const items=catalog.filter(x=>x.year===year)
+    const events=[...new Set(items.map(x=>x.event))].sort()
+    return(
+      <section key={year} style={{marginTop:'38px'}}>
+        <h2>{year}</h2>
+        {events.map(event=>{
+          const eventItems=items.filter(x=>x.event===event)
+          return(
+            <div key={event} style={{marginTop:'24px'}}>
+              <h3>{event}</h3>
+              {event.includes('8 Марта') && <p style={{color:'#667085'}}>Международный женский день — дети поздравляют мам.</p>}
+              <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(220px,1fr))',gap:'20px'}}>
+                {eventItems.map(item=>(
+                  <div key={item.id} style={{position:'relative',border:'1px solid #eee',padding:'10px',borderRadius:'18px',background:'#fff',overflow:'hidden'}}>
+                    <img src={item.src} alt={item.event} draggable={false} style={{width:'100%',height:'210px',objectFit:'cover',borderRadius:'14px',userSelect:'none'}}/>
+                    <div style={{position:'absolute',right:'16px',bottom:'58px',background:'rgba(255,255,255,.8)',padding:'5px 9px',borderRadius:'999px',fontWeight:800,fontSize:'12px'}}>Тотоша</div>
+                    <div style={{padding:'10px 2px 4px'}}>
+                      <b>{item.event}</b>
+                      <div style={{color:'#667085',fontSize:'14px'}}>{item.group || 'Группа не определена'}</div>
+                    </div>
                   </div>
-                </div>
-              )
-            })}
-          </section>
-        )
-      })}
-    </main>
-  )
+                ))}
+              </div>
+            </div>
+          )
+        })}
+      </section>
+    )
+  })}
+</main>
+)
 }
