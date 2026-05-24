@@ -82,9 +82,13 @@ jobs:
         working-directory: site
         run: npm run build
 
-      - name: Commit release to TOTOSHA
+            - name: Commit release to TOTOSHA
         working-directory: site
         run: |
+          rm -rf node_modules .next
+          find . -type d -name node_modules -prune -exec rm -rf {} +
+          find . -type d -name .next -prune -exec rm -rf {} +
+
           git config user.name "NEXORA Release Bot"
           git config user.email "nexora-release-bot@users.noreply.github.com"
 
@@ -98,8 +102,3 @@ jobs:
           git add .
           git commit -m "TOTOSHA release ${{ steps.release.outputs.version }}"
           git push
-
-      - name: Release result
-        run: |
-          echo "NEXORA Release Manager completed"
-          echo "Released: ${{ steps.release.outputs.version }}"
