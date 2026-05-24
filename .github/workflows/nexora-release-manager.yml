@@ -1,9 +1,6 @@
 name: NEXORA Release Manager
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:
@@ -26,17 +23,25 @@ jobs:
           repository: nexora-kz/totosha-updates
           path: updates
 
-      - name: Find latest approved release
+      - name: Read active release
         id: release
         run: |
-          latest=$(find updates/release -maxdepth 2 -name release.json | sort -V | tail -n 1)
-          echo "Latest release file: $latest"
+          current="updates/release/current.json"
+          version=$(jq -r '.active_version' "$current")
+          auto_deploy=$(jq -r '.auto_deploy' "$current")
 
-          version=$(jq -r '.version' "$latest")
-          status=$(jq -r '.status' "$latest")
-          approved=$(jq -r '.release' "$latest")
-          source=$(jq -r '.source' "$latest")
-          dir=$(dirname "$latest")
+          if [ "$auto_deploy" != "true" ]; then
+            echo "Auto deploy is disabled"
+            exit 1
+          fi
+
+          release_file="updates/release/$version/release.json"
+          echo "Active release file: $release_file"
+
+          status=$(jq -r '.status' "$release_file")
+          approved=$(jq -r '.release' "$release_file")
+          source=$(jq -r '.source' "$release_file")
+          dir=$(dirname "$release_file")
 
           if [ "$status" != "approved" ]; then
             echo "Release is not approved"
@@ -100,9 +105,11 @@ jobs:
           fi
 
           git add .
-
-          git commit -m "TOTOSHA release auto" || true
-
+          git commit -m "TOTOSHA release ${{ steps.release.outputs.version }}" || true
           git pull --rebase origin main
+          git push origin main
 
-          git push origin main  
+      - name: Release result
+        run: |
+          echo "NEXORA Release Manager completed"
+          echo "Released: ${{ steps.release.outputs.version }}"
