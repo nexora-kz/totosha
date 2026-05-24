@@ -40,7 +40,6 @@ export default function MediaTestPage() {
       category: item.category && !item.category.toLowerCase().includes('не определ') ? item.category : 'Жизнь детского сада',
       group: item.group && !item.group.toLowerCase().includes('не определ') ? item.group : 'Группа уточняется',
     }))
-    .filter((item) => Boolean(item.src))
     .sort((a, b) => timeOf(b) - timeOf(a))
 
   const years = [...new Set(catalog.map((x) => x.year || 'Год уточняется'))]
