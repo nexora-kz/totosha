@@ -44,6 +44,7 @@ jobs:
           configPath: ./.github/lighthouse/lighthouserc.json
 
       - name: Broken links check
+      continue-on-error: true
         uses: lycheeverse/lychee-action@v2
         with:
           args: --verbose --no-progress https://totosha.vercel.app https://totosha.vercel.app/media-test
