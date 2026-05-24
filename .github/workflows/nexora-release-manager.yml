@@ -6,33 +6,100 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
-  quality-check:
+  release-engine:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout TOTOSHA
         uses: actions/checkout@v4
+        with:
+          path: site
+
+      - name: Checkout TOTOSHA updates
+        uses: actions/checkout@v4
+        with:
+          repository: nexora-kz/totosha-updates
+          path: updates
+
+      - name: Find latest approved release
+        id: release
+        run: |
+          latest=$(find updates/release -maxdepth 2 -name release.json | sort -V | tail -n 1)
+          echo "Latest release file: $latest"
+
+          version=$(jq -r '.version' "$latest")
+          status=$(jq -r '.status' "$latest")
+          approved=$(jq -r '.release' "$latest")
+          source=$(jq -r '.source' "$latest")
+          dir=$(dirname "$latest")
+
+          if [ "$status" != "approved" ]; then
+            echo "Release is not approved"
+            exit 1
+          fi
+
+          if [ "$approved" != "true" ]; then
+            echo "Release flag is not true"
+            exit 1
+          fi
+
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "source=$source" >> $GITHUB_OUTPUT
+          echo "dir=$dir" >> $GITHUB_OUTPUT
+
+      - name: Extract release ZIP
+        run: |
+          mkdir -p /tmp/nexora-release
+          unzip "${{ steps.release.outputs.dir }}/${{ steps.release.outputs.source }}" -d /tmp/nexora-release
+          ls -la /tmp/nexora-release
+
+      - name: Apply release to TOTOSHA
+        run: |
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            /tmp/nexora-release/ site/
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: site/package-lock.json
 
       - name: Install dependencies
+        working-directory: site
         run: npm ci
 
       - name: Build Next.js
+        working-directory: site
         run: npm run build
 
-      - name: Check production URLs
-        continue-on-error: true
+      - name: Commit release to TOTOSHA
+        working-directory: site
         run: |
-          curl -I https://totosha.vercel.app || true
-          curl -I https://totosha.vercel.app/media-test || true
+          git config user.name "NEXORA Release Bot"
+          git config user.email "nexora-release-bot@users.noreply.github.com"
+
+          git status --short
+
+          if [ -z "$(git status --short)" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git add .
+          git commit -m "TOTOSHA release ${{ steps.release.outputs.version }}"
+          git push
 
       - name: Release result
         run: |
-          echo "NEXORA Release Manager completed successfully"
-          echo "TOTOSHA build is valid"
+          echo "NEXORA Release Manager completed"
+          echo "Released: ${{ steps.release.outputs.version }}"
