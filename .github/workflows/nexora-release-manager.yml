@@ -10,11 +10,11 @@ on:
 
 permissions:
   contents: write
-  actions: write
+  actions: read
 
 concurrency:
   group: nexora-package-release
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   package-release:
@@ -85,18 +85,4 @@ jobs:
           fi
 
           git commit -m "Create TOTOSHA release ${{ github.event.inputs.version }}"
-
-          for i in 1 2 3 4 5; do
-            git push origin HEAD:main --force && break
-            echo "Push failed, retry $i..."
-            sleep 5
-            git fetch origin main
-          done
-
-      - name: Trigger TOTOSHA Release Manager
-        run: |
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.NEXORA_TOKEN }}" \
-            https://api.github.com/repos/nexora-kz/totosha/actions/workflows/nexora-release-manager.yml/dispatches \
-            -d '{"ref":"main"}'
+          git push origin HEAD:main --force
