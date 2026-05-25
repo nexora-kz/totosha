@@ -54,7 +54,7 @@ function Home({setPage}:{setPage:(p:Page)=>void}){return <><Hero setPage={setPag
 function Footer({setPage}:{setPage:(p:Page)=>void}){return <footer className="footer"><div className="container footer-row"><div><div className="brand-title">Тотоша</div><div className="brand-sub">Детский сад нового поколения. Powered by NEXORA.</div></div><div className="hero-actions" style={{marginTop:0}}><Btn kind="light" onClick={()=>wa('Здравствуйте. Хочу узнать подробнее про Тотоша.')}>WhatsApp</Btn><Btn kind="light" onClick={()=>ext(INSTAGRAM_URL)}>Instagram</Btn><Btn kind="light" onClick={()=>setPage('cabinet')}>Цифровой кабинет</Btn></div></div></footer>}
 export default function App(){const [page,setPage]=useState<Page>('home'); const current={home:<Home setPage={setPage}/>,about:<AboutPage/>,programs:<ProgramsPage/>,parents:<ParentsPage/>,cabinet:<Cabinet/>,franchise:<Franchise/>,contacts:<Contacts/>}[page]; return <div className="page"><Header page={page} setPage={setPage}/><main>
       <div className="version-badge" title="NEXORA automated release marker">
-        <strong>TOTOSHA v29</strong>
+        <strong>TOTOSHA v034</strong>
         <span>Build 2026-05-25</span>
         <em>NEXORA Deploy ✓</em>
       </div>
