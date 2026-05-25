@@ -1,0 +1,136 @@
+name: NEXORA Release Manager
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: nexora-release-manager
+  cancel-in-progress: true
+
+jobs:
+  release-engine:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout TOTOSHA
+        uses: actions/checkout@v4
+        with:
+          path: site
+          fetch-depth: 0
+
+      - name: Checkout TOTOSHA updates
+        uses: actions/checkout@v4
+        with:
+          repository: nexora-kz/totosha-updates
+          token: ${{ secrets.NEXORA_TOKEN }}
+          path: updates
+          fetch-depth: 0
+
+      - name: Read active release
+        id: release
+        run: |
+          CURRENT="updates/release/current.json"
+
+          VERSION=$(jq -r '.active_version' "$CURRENT")
+          AUTO_DEPLOY=$(jq -r '.auto_deploy' "$CURRENT")
+
+          if [ "$AUTO_DEPLOY" != "true" ]; then
+            echo "Auto deploy is disabled"
+            exit 1
+          fi
+
+          RELEASE_FILE="updates/release/${VERSION}/release.json"
+
+          STATUS=$(jq -r '.status' "$RELEASE_FILE")
+          APPROVED=$(jq -r '.release' "$RELEASE_FILE")
+          SOURCE=$(jq -r '.source' "$RELEASE_FILE")
+          DIR=$(dirname "$RELEASE_FILE")
+
+          if [ "$STATUS" != "approved" ]; then
+            echo "Release is not approved"
+            exit 1
+          fi
+
+          if [ "$APPROVED" != "true" ]; then
+            echo "Release flag is not true"
+            exit 1
+          fi
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "source=$SOURCE" >> "$GITHUB_OUTPUT"
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Extract release ZIP
+        run: |
+          rm -rf /tmp/nexora-release
+          mkdir -p /tmp/nexora-release
+
+          unzip "${{ steps.release.outputs.dir }}/${{ steps.release.outputs.source }}" -d /tmp/nexora-release
+
+          echo "Extracted release:"
+          ls -la /tmp/nexora-release
+
+      - name: Apply release to TOTOSHA
+        run: |
+          SOURCE="/tmp/nexora-release"
+
+          if [ -d "/tmp/nexora-release/totosha-main" ]; then
+            SOURCE="/tmp/nexora-release/totosha-main"
+          fi
+
+          echo "Using release source: $SOURCE"
+
+          rsync -a --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='.next' \
+            "$SOURCE/" site/
+
+          rm -rf site/totosha-main
+          rm -rf site/node_modules
+          rm -rf site/.next
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Build Next.js
+        working-directory: site
+        run: npm run build
+
+      - name: Commit release to TOTOSHA
+        working-directory: site
+        run: |
+          rm -rf node_modules .next
+
+          git config user.name "NEXORA Release Bot"
+          git config user.email "nexora-release-bot@users.noreply.github.com"
+
+          git add .
+
+          if [ -z "$(git status --short)" ]; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "TOTOSHA release ${{ steps.release.outputs.version }}"
+
+          git pull --rebase origin main
+          git push origin main
+
+      - name: Release result
+        run: |
+          echo "NEXORA Release Manager completed"
+          echo "Released: ${{ steps.release.outputs.version }}"
