@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version, example: v032"
+        description: "Release version, example: v033"
         required: true
-        default: "v032"
+        default: "v033"
 
 permissions:
   contents: write
@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout TOTOSHA
         uses: actions/checkout@v4
         with:
@@ -32,9 +33,11 @@ jobs:
           repository: nexora-kz/totosha-updates
           token: ${{ secrets.NEXORA_TOKEN }}
           path: updates
+          fetch-depth: 0
 
       - name: Create release ZIP
         run: |
+
           VERSION="${{ github.event.inputs.version }}"
           ZIP_NAME="totosha-production-${VERSION}.zip"
 
@@ -43,8 +46,11 @@ jobs:
 
           cd site
 
-          rm -rf node_modules .next
+          rm -rf node_modules
+          rm -rf .next
+
           find . -type d -name node_modules -prune -exec rm -rf {} +
+
           find . -type d -name .next -prune -exec rm -rf {} +
 
           zip -r "../updates/release/${VERSION}/${ZIP_NAME}" . \
@@ -55,7 +61,7 @@ jobs:
 
           cd ..
 
-          cat > "updates/release/${VERSION}/release.json" <<EOF
+          cat > updates/release/${VERSION}/release.json << EOF
           {
             "version":"${VERSION}",
             "status":"approved",
@@ -64,25 +70,32 @@ jobs:
           }
           EOF
 
-          cat > "updates/release/current.json" <<EOF
+          cat > updates/release/current.json << EOF
           {
             "active_version":"${VERSION}",
             "auto_deploy":true
           }
           EOF
 
-      - name: Commit release package to updates
+      - name: Commit release package
         working-directory: updates
         run: |
+
           git config user.name "NEXORA Package Bot"
-          git config user.email "nexora-package-bot@users.noreply.github.com"
+
+          git config user.email \
+          "nexora-package-bot@users.noreply.github.com"
+
+          git pull origin main
 
           git add release
 
           if [ -z "$(git status --short)" ]; then
-            echo "No release changes to commit"
+            echo "No changes"
             exit 0
           fi
 
-          git commit -m "Create TOTOSHA release ${{ github.event.inputs.version }}"
-          git push origin HEAD:main --force
+          git commit \
+          -m "Create TOTOSHA release ${{ github.event.inputs.version }}"
+
+          git push origin main
