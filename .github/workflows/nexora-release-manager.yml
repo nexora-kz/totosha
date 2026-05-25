@@ -34,6 +34,7 @@ jobs:
           VERSION="${{ github.event.inputs.version }}"
           ZIP_NAME="totosha-production-${VERSION}.zip"
 
+          rm -rf "updates/release/${VERSION}"
           mkdir -p "updates/release/${VERSION}"
 
           cd site
@@ -73,9 +74,15 @@ jobs:
           git config user.email "nexora-package-bot@users.noreply.github.com"
 
           git add release
-          git commit -m "Create TOTOSHA release ${{ github.event.inputs.version }}" || true
-          git pull --rebase origin main
-          git push origin main
+
+          if [ -z "$(git status --short)" ]; then
+            echo "No release changes to commit"
+            exit 0
+          fi
+
+          git commit -m "Create TOTOSHA release ${{ github.event.inputs.version }}"
+
+          git push origin HEAD:main --force
 
       - name: Trigger TOTOSHA Release Manager
         run: |
