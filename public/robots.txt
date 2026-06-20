@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /totosha-media/
+
+Sitemap: https://www.totoshakids.kz/sitemap-totosha.xml
+Host: https://www.totoshakids.kz
