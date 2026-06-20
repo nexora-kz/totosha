@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './v035.css';
 
 export const metadata: Metadata = {
   title: 'Тотоша — детский сад нового поколения в Астане',
