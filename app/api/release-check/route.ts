@@ -3,6 +3,17 @@ import { TOTOSHA_BUILD_DATE, TOTOSHA_CONTACTS, TOTOSHA_VERSION } from '../../../
 
 const SITE_URL = 'https://www.totoshakids.kz';
 
+const REQUIRED_PAGES = [
+  { path: '/', marker: 'Тотоша' },
+  { path: '/about', marker: 'Тотоша' },
+  { path: '/programs', marker: 'Программы' },
+  { path: '/parents', marker: 'Родителям' },
+  { path: '/cabinet', marker: 'Цифровой кабинет' },
+  { path: '/franchise', marker: 'Франшиза' },
+  { path: '/contacts', marker: TOTOSHA_CONTACTS.phoneDisplay },
+  { path: '/life', marker: 'Жизнь Тотоша' },
+] as const;
+
 type PageCheck = {
   path: string;
   status: number | null;
@@ -23,7 +34,7 @@ async function checkPage(path: string, requiredText?: string, requiredAny?: stri
     const response = await fetch(`${SITE_URL}${path}`, {
       cache: 'no-store',
       headers: {
-        'User-Agent': 'TOTOSHA-Release-Gate/1.1',
+        'User-Agent': 'TOTOSHA-Release-Gate/1.2',
       },
     });
     const text = await response.text();
@@ -67,15 +78,8 @@ export async function GET(request: NextRequest) {
     ready(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
   const checks = await Promise.all([
-    checkPage('/', 'Тотоша'),
-    checkPage('/life', 'Жизнь Тотоша'),
-    checkPage('/contacts', TOTOSHA_CONTACTS.phoneDisplay),
-    checkPage('/about', 'Тотоша'),
-    checkPage('/programs', 'Программы'),
-    checkPage('/parents', 'Родителям'),
-    checkPage('/cabinet', 'Цифровой кабинет'),
-    checkPage('/franchise', 'Франшиза'),
-    checkPage('/sitemap.xml', undefined, ['totoshakids.kz', '/contacts', '<urlset', '<sitemapindex']),
+    ...REQUIRED_PAGES.map((item) => checkPage(item.path, item.marker)),
+    checkPage('/sitemap.xml', undefined, ['totoshakids.kz', '/about', '/programs', '/contacts', '<urlset', '<sitemapindex']),
     checkPage('/robots.txt', undefined, ['sitemap.xml', 'Sitemap', 'User-agent', 'User-Agent']),
     checkPage('/api/health', 'totosha-site'),
   ]);
@@ -89,9 +93,11 @@ export async function GET(request: NextRequest) {
     service: 'totosha-release-gate',
     site: SITE_URL,
     version: TOTOSHA_VERSION,
+    stable: TOTOSHA_VERSION === 'v037',
     buildDate: TOTOSHA_BUILD_DATE,
     environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'unknown',
     checkedAt: new Date().toISOString(),
+    requiredPages: REQUIRED_PAGES.map((item) => item.path),
     commit: {
       expected: expectedCommit || null,
       live: liveCommit,
