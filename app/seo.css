@@ -12,7 +12,7 @@
 }
 
 .seo-landing__hero {
-  padding: 52px 0 34px;
+  padding: 42px 0 34px;
 }
 
 .seo-landing__brand {
@@ -21,7 +21,24 @@
   gap: 14px;
   color: inherit;
   text-decoration: none;
-  margin-bottom: 48px;
+  margin-bottom: 18px;
+}
+
+.seo-landing__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 44px;
+}
+
+.seo-landing__nav a {
+  color: #0f172a;
+  text-decoration: none;
+  font-weight: 900;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid #fed7aa;
 }
 
 .seo-landing__logo {
@@ -73,6 +90,41 @@
 
 .seo-landing__content {
   padding: 38px 0 56px;
+}
+
+.seo-landing__details,
+.seo-landing__faq {
+  padding-top: 8px;
+}
+
+.seo-detail-list,
+.seo-faq-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.seo-detail,
+.seo-faq {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 28px;
+  padding: clamp(20px, 3vw, 30px);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+}
+
+.seo-detail h3,
+.seo-faq h3 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+
+.seo-detail p,
+.seo-faq p {
+  color: #64748b;
+  line-height: 1.7;
+  margin: 0;
 }
 
 .seo-landing__footer {
@@ -173,7 +225,9 @@
 }
 
 @media (max-width: 860px) {
-  .status-grid {
+  .status-grid,
+  .seo-detail-list,
+  .seo-faq-list {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -191,7 +245,9 @@
     justify-content: center;
   }
 
-  .status-grid {
+  .status-grid,
+  .seo-detail-list,
+  .seo-faq-list {
     grid-template-columns: 1fr;
   }
 }
