@@ -1,6 +1,6 @@
-export const TOTOSHA_VERSION = 'v035';
-export const TOTOSHA_BUILD_DATE = '2026-06-20';
-export const TOTOSHA_DEPLOY_LABEL = 'NEXORA Deploy ✓';
+export const TOTOSHA_VERSION = 'v037';
+export const TOTOSHA_BUILD_DATE = '2026-06-21';
+export const TOTOSHA_DEPLOY_LABEL = 'Stable Web v037 ✓';
 
 export const TOTOSHA_CONTACTS = {
   phoneDigits: '77767002929',
