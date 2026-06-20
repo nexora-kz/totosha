@@ -47,7 +47,8 @@ export default function StatusPage() {
           ))}
         </div>
         <div className="status-actions">
-          <a className="btn btn-primary" href="/api/health">Открыть health-check</a>
+          <a className="btn btn-primary" href={`/api/release-check?commit=${commit}`}>Release Gate</a>
+          <a className="btn btn-light" href="/api/health">Health-check</a>
           <a className="btn btn-light" href="/sitemap.xml">Sitemap</a>
           <a className="btn btn-light" href="/robots.txt">Robots</a>
           <a className="btn btn-light" href="/">На сайт</a>
