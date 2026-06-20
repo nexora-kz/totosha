@@ -83,42 +83,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <script
-          id="totosha-real-url-navigation-v036"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var routes = {
-                  'О нас': '/about',
-                  'Программы': '/programs',
-                  'Родителям': '/parents',
-                  'Технологии': '/cabinet',
-                  'Цифровой кабинет': '/cabinet',
-                  'Франшиза': '/franchise',
-                  'Контакты': '/contacts',
-                  'Записаться': '/contacts',
-                  'Главная': '/'
-                };
-
-                document.addEventListener('click', function(event) {
-                  var target = event.target;
-                  var button = target && target.closest ? target.closest('.header button') : null;
-                  if (!button) return;
-
-                  var text = (button.textContent || '').replace(/\s+/g, ' ').trim();
-                  var href = routes[text];
-                  if (!href) return;
-
-                  event.preventDefault();
-                  event.stopPropagation();
-                  if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-                  if (window.location.pathname === href) return;
-                  window.location.href = href;
-                }, true);
-              })();
-            `,
-          }}
-        />
-        <script
           id="totosha-photo-protection"
           dangerouslySetInnerHTML={{
             __html: `
