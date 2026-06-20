@@ -1,0 +1,9 @@
+@echo off
+title TOTOSHA Install Dependencies
+echo Setting npm registry...
+call npm config set registry https://registry.npmjs.org/
+echo Cleaning npm cache...
+call npm cache clean --force
+echo Installing dependencies...
+call npm install
+pause
