@@ -4,88 +4,71 @@
   color: #0f172a;
 }
 
-.seo-landing__hero,
-.seo-landing__content,
-.seo-landing__footer {
-  width: min(1120px, calc(100% - 40px));
-  margin: 0 auto;
+.seo-page-unified {
+  animation: totosha-soft-enter 0.28s ease both;
 }
 
-.seo-landing__hero {
-  padding: 42px 0 34px;
+@keyframes totosha-soft-enter {
+  from {
+    opacity: 0.01;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.seo-landing__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 14px;
+.seo-unified-header {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(18px);
+}
+
+.seo-unified-header .brand,
+.seo-unified-header .links a {
   color: inherit;
   text-decoration: none;
-  margin-bottom: 18px;
 }
 
-.seo-landing__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 0 0 44px;
+.seo-unified-header .logo {
+  font-size: 22px;
 }
 
-.seo-landing__nav a {
-  color: #0f172a;
-  text-decoration: none;
+.seo-unified-header .links a {
   font-weight: 900;
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid #fed7aa;
-}
-
-.seo-landing__logo {
-  width: 58px;
-  height: 58px;
-  border-radius: 20px;
-  display: grid;
-  place-items: center;
-  background: linear-gradient(135deg, #fb923c, #f97316);
-  box-shadow: 0 16px 35px rgba(249, 115, 22, 0.18);
-}
-
-.seo-landing__brand b {
-  display: block;
-  font-size: 28px;
+  white-space: nowrap;
   line-height: 1;
+  transition: color 0.18s ease, transform 0.18s ease;
 }
 
-.seo-landing__brand small {
-  display: block;
-  max-width: 180px;
-  color: #64748b;
-  font-weight: 800;
-  line-height: 1.15;
-  margin-top: 6px;
+.seo-unified-header .links a:hover {
+  color: #f97316;
+  transform: translateY(-1px);
 }
 
-.seo-landing__hero h1 {
-  max-width: 880px;
-  font-size: clamp(42px, 7vw, 76px);
-  line-height: 0.96;
-  letter-spacing: -0.06em;
-  margin: 16px 0 24px;
+.seo-unified-hero {
+  padding-top: 92px;
 }
 
-.seo-landing__hero p {
-  max-width: 780px;
-  color: #475569;
-  font-size: clamp(18px, 2vw, 23px);
-  line-height: 1.65;
+.seo-hero-grid {
+  align-items: center;
 }
 
-.seo-landing__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 30px;
+.seo-hero-card {
+  min-height: 0;
+}
+
+.seo-hero-scene {
+  min-height: 440px;
+}
+
+.seo-hero-scene .dash h3 {
+  font-size: clamp(20px, 2.4vw, 26px);
+}
+
+.seo-hero-scene .dash-row b {
+  color: #16a34a;
+  font-size: 13px;
 }
 
 .seo-landing__content {
@@ -128,6 +111,8 @@
 }
 
 .seo-landing__footer {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
   border-top: 1px solid #fed7aa;
   padding: 24px 0 42px;
   display: flex;
@@ -224,6 +209,19 @@
   gap: 12px;
 }
 
+@media (max-width: 1100px) {
+  .seo-unified-header .links,
+  .seo-unified-header .actions {
+    display: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .seo-hero-scene {
+    min-height: 420px;
+  }
+}
+
 @media (max-width: 860px) {
   .status-grid,
   .seo-detail-list,
@@ -233,13 +231,15 @@
 }
 
 @media (max-width: 720px) {
-  .seo-landing__hero,
-  .seo-landing__content,
   .seo-landing__footer {
     width: min(100% - 28px, 1120px);
   }
 
-  .seo-landing__actions .btn,
+  .seo-unified-hero {
+    padding-top: 78px;
+  }
+
+  .seo-page-unified .hero-actions .btn,
   .status-actions .btn {
     width: 100%;
     justify-content: center;
