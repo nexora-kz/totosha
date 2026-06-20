@@ -1,5 +1,9 @@
 /* TOTOSHA v035 visual sync and production polish */
 
+.version-badge {
+  display: none !important;
+}
+
 .brand {
   min-width: 245px;
 }
@@ -204,8 +208,18 @@
 }
 
 .phone-wrap input::placeholder {
+  color: transparent;
+}
+
+.phone-help {
+  font-size: 0 !important;
+}
+
+.phone-help::after {
+  content: 'Введите 10 цифр вашего номера после +7.';
+  font-size: 13px;
   color: #94a3b8;
-  letter-spacing: 0;
+  font-weight: 800;
 }
 
 .form button[disabled] {
