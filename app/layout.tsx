@@ -29,6 +29,38 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
+        <script
+          id="totosha-life-top-button"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function mountLifeTopButton() {
+                  if (window.location.pathname !== '/life') return;
+                  if (document.getElementById('totosha-life-floating')) return;
+                  var wrap = document.createElement('div');
+                  wrap.id = 'totosha-life-floating';
+                  wrap.className = 'life-floating';
+                  var btn = document.createElement('a');
+                  btn.className = 'life-to-top';
+                  btn.href = '#';
+                  btn.setAttribute('aria-label', 'Наверх');
+                  btn.textContent = '↑';
+                  btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  });
+                  wrap.appendChild(btn);
+                  document.body.appendChild(wrap);
+                }
+                if (document.readyState === 'loading') {
+                  document.addEventListener('DOMContentLoaded', mountLifeTopButton);
+                } else {
+                  mountLifeTopButton();
+                }
+              })();
+            `,
+          }}
+        />
 
       </body></html>;
 }
