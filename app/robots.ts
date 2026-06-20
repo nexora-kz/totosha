@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/_next/', '/totosha-media/'],
+        disallow: ['/api/', '/totosha-media/'],
       },
     ],
     sitemap: 'https://www.totoshakids.kz/sitemap.xml',
