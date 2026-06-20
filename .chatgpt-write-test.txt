@@ -1,2 +1,0 @@
-TOTOSHA write test from ChatGPT.
-If this file exists, GitHub write access works.
