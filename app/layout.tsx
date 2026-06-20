@@ -30,6 +30,70 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <script
+          id="totosha-lead-flow-v035"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var blockAutoWhatsAppUntil = 0;
+                var lastWhatsAppUrl = '';
+                var nativeOpen = window.open;
+
+                window.open = function(url, target, features) {
+                  var href = String(url || '');
+                  var isWhatsApp = href.indexOf('https://wa.me/') === 0 || href.indexOf('http://wa.me/') === 0;
+                  if (isWhatsApp && Date.now() < blockAutoWhatsAppUntil) {
+                    lastWhatsAppUrl = href;
+                    setTimeout(enhanceSuccessMessage, 80);
+                    setTimeout(enhanceSuccessMessage, 300);
+                    setTimeout(enhanceSuccessMessage, 900);
+                    return null;
+                  }
+                  return nativeOpen.call(window, url, target, features);
+                };
+
+                document.addEventListener('click', function(event) {
+                  var target = event.target;
+                  var button = target && target.closest ? target.closest('.form .btn-primary') : null;
+                  if (!button) return;
+                  var form = button.closest('.form');
+                  if (!form) return;
+                  blockAutoWhatsAppUntil = Date.now() + 5000;
+                }, true);
+
+                function enhanceSuccessMessage() {
+                  var cards = document.querySelectorAll('.form .success');
+                  cards.forEach(function(card) {
+                    if (card.dataset.v035Enhanced === '1') return;
+                    card.dataset.v035Enhanced = '1';
+                    var title = card.querySelector('b');
+                    var text = card.querySelector('p');
+                    if (title) title.textContent = 'Заявка принята';
+                    if (text) text.textContent = 'Спасибо. Айшагуль Галымжановна свяжется с вами в ближайшее время.';
+
+                    var actions = document.createElement('div');
+                    actions.className = 'lead-success-actions';
+
+                    var note = document.createElement('span');
+                    note.textContent = 'Хотите быстрее? Можно написать напрямую:';
+                    actions.appendChild(note);
+
+                    var link = document.createElement('button');
+                    link.type = 'button';
+                    link.className = 'btn btn-light lead-whatsapp-button';
+                    link.textContent = 'Написать в WhatsApp';
+                    link.addEventListener('click', function() {
+                      var url = lastWhatsAppUrl || 'https://wa.me/77767002929?text=' + encodeURIComponent('Здравствуйте. Хочу узнать подробнее про Тотоша.');
+                      nativeOpen.call(window, url, '_blank', 'noopener,noreferrer');
+                    });
+                    actions.appendChild(link);
+                    card.appendChild(actions);
+                  });
+                }
+              })();
+            `,
+          }}
+        />
+        <script
           id="totosha-life-top-button"
           dangerouslySetInnerHTML={{
             __html: `
