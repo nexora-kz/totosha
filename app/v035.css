@@ -242,6 +242,27 @@
   margin-bottom: 0;
 }
 
+.lead-success-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.lead-success-actions span {
+  color: #047857;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.lead-whatsapp-button {
+  width: 100%;
+  justify-content: center;
+  background: #ffffff !important;
+  border-color: #bbf7d0 !important;
+  color: #047857 !important;
+}
+
 .life-floating {
   position: fixed;
   right: 22px;
