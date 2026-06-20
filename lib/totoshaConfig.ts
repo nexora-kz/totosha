@@ -3,10 +3,12 @@ export const TOTOSHA_BUILD_DATE = '2026-06-20';
 export const TOTOSHA_DEPLOY_LABEL = 'NEXORA Deploy ✓';
 
 export const TOTOSHA_CONTACTS = {
-  phoneDigits: '77071230108',
-  phoneDisplay: '+7 707 123 01 08',
-  telUrl: 'tel:+77071230108',
-  whatsappUrl: 'https://wa.me/77071230108',
+  phoneDigits: '77767002929',
+  phoneDisplay: '+7 (776) 700-29-29',
+  contactPerson: 'Айшагуль Галымжановна',
+  contactRole: 'Заведующая детским садом',
+  telUrl: 'tel:+77767002929',
+  whatsappUrl: 'https://wa.me/77767002929',
   instagramUrl: 'https://www.instagram.com/totoshakids/',
   telegramUrl: 'https://t.me/totoshakids',
   mapUrl:
