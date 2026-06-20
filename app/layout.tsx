@@ -37,6 +37,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="ru"><body>{children}
+        <nav
+          aria-label="Индексируемые страницы Тотоша"
+          style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
+        >
+          <a href="/">Главная</a>
+          <a href="/about">О нас</a>
+          <a href="/programs">Программы</a>
+          <a href="/parents">Родителям</a>
+          <a href="/cabinet">Технологии</a>
+          <a href="/franchise">Франшиза</a>
+          <a href="/contacts">Контакты</a>
+          <a href="/life">Жизнь Тотоша</a>
+        </nav>
         <script
           id="totosha-json-ld"
           type="application/ld+json"
@@ -67,6 +80,42 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 'https://t.me/totoshakids',
               ],
             }),
+          }}
+        />
+        <script
+          id="totosha-real-url-navigation-v036"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var routes = {
+                  'О нас': '/about',
+                  'Программы': '/programs',
+                  'Родителям': '/parents',
+                  'Технологии': '/cabinet',
+                  'Цифровой кабинет': '/cabinet',
+                  'Франшиза': '/franchise',
+                  'Контакты': '/contacts',
+                  'Записаться': '/contacts',
+                  'Главная': '/'
+                };
+
+                document.addEventListener('click', function(event) {
+                  var target = event.target;
+                  var button = target && target.closest ? target.closest('.header button') : null;
+                  if (!button) return;
+
+                  var text = (button.textContent || '').replace(/\s+/g, ' ').trim();
+                  var href = routes[text];
+                  if (!href) return;
+
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+                  if (window.location.pathname === href) return;
+                  window.location.href = href;
+                }, true);
+              })();
+            `,
           }}
         />
         <script
