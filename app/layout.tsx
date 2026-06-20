@@ -1,16 +1,74 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import './v035.css';
+import './seo.css';
 
 export const metadata: Metadata = {
-  title: 'Тотоша — детский сад нового поколения в Астане',
-  description: 'Тотоша — современный детский сад: видеонаблюдение, логопед, Английский язык, хореография, вокал, таэквондо, врач-педиатр и Цифровой кабинет.',
-  keywords: ['детский сад Астана','Тотоша','частный детский сад','детский сад с видеонаблюдением','логопед Астана','подготовка к школе'],
-  openGraph: { title: 'Тотоша — место, где забота стала системой', description: 'Безопасность • Развитие • Технологии • Забота', type: 'website', locale: 'ru_KZ' },
+  metadataBase: new URL('https://www.totoshakids.kz'),
+  title: {
+    default: 'Тотоша — детский сад нового поколения в Астане',
+    template: '%s | Тотоша',
+  },
+  description: 'Тотоша — современный детский сад в Астане: видеонаблюдение, логопед, Английский язык, хореография, вокал, таэквондо, врач-педиатр и Цифровой кабинет.',
+  keywords: ['детский сад Астана','Тотоша','частный детский сад','детский сад с видеонаблюдением','логопед Астана','подготовка к школе','детский сад левый берег','садик Астана'],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Тотоша — место, где забота стала системой',
+    description: 'Современный детский сад в Астане: безопасность, развитие, технологии и забота.',
+    url: 'https://www.totoshakids.kz',
+    siteName: 'Тотоша',
+    type: 'website',
+    locale: 'ru_KZ',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-snippet': -1,
+      'max-image-preview': 'large',
+      'max-video-preview': -1,
+    },
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="ru"><body>{children}
+        <script
+          id="totosha-json-ld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Preschool',
+              name: 'Тотоша',
+              alternateName: 'Totosha Kids',
+              url: 'https://www.totoshakids.kz',
+              logo: 'https://www.totoshakids.kz/icon.png',
+              description: 'Современный детский сад нового поколения в Астане с видеонаблюдением, цифровым кабинетом, логопедом, английским языком и дополнительными занятиями.',
+              telephone: '+7 776 700 29 29',
+              areaServed: 'Астана, Казахстан',
+              address: {
+                '@type': 'PostalAddress',
+                addressLocality: 'Астана',
+                addressCountry: 'KZ',
+              },
+              openingHoursSpecification: [{
+                '@type': 'OpeningHoursSpecification',
+                dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+                opens: '07:30',
+                closes: '19:00',
+              }],
+              sameAs: [
+                'https://www.instagram.com/totoshakids/',
+                'https://t.me/totoshakids',
+              ],
+            }),
+          }}
+        />
         <script
           id="totosha-photo-protection"
           dangerouslySetInnerHTML={{
