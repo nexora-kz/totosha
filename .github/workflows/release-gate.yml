@@ -1,0 +1,10 @@
+name: TOTOSHA Release Gate
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TOTOSHA Release Gate placeholder"
