@@ -158,11 +158,6 @@ export function SeoLanding({
           </div>
         </section>
       )}
-
-      <section className="seo-landing__footer">
-        {nav.map(([href, label]) => <a key={href} href={href}>{label}</a>)}
-        <a href="/life">Жизнь Тотоша</a>
-      </section>
     </main>
   );
 }
