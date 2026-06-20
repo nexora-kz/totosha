@@ -1,10 +1,48 @@
 name: TOTOSHA Release Gate
 
 on:
+  push:
+    branches:
+      - '**'
   workflow_dispatch:
+
+concurrency:
+  group: totosha-release-gate-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release-gate:
+    name: Check live site after deployment
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+
     steps:
-      - run: echo "TOTOSHA Release Gate placeholder"
+      - name: Run live Release Gate
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const commit = context.sha.slice(0, 12);
+            const url = `https://www.totoshakids.kz/api/release-check?commit=${commit}`;
+            core.info(`Expected commit: ${commit}`);
+            core.info(`Release Gate: ${url}`);
+
+            for (let attempt = 1; attempt <= 45; attempt += 1) {
+              core.info(`Attempt ${attempt}/45`);
+              try {
+                const response = await fetch(url, { cache: 'no-store' });
+                const text = await response.text();
+                core.info(text);
+                const data = JSON.parse(text);
+
+                if (data.ok === true && data.gate === 'pass' && data.commit?.matches === true) {
+                  core.info('TOTOSHA Release Gate PASSED');
+                  return;
+                }
+              } catch (error) {
+                core.info(`Release Gate is not ready yet: ${error.message}`);
+              }
+
+              await new Promise((resolve) => setTimeout(resolve, 20000));
+            }
+
+            core.setFailed(`TOTOSHA Release Gate FAILED for ${commit}`);
