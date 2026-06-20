@@ -35,20 +35,40 @@ export const metadata: Metadata = {
   },
 };
 
+const indexLinkStyle = {
+  color: '#0f172a',
+  textDecoration: 'none',
+  fontWeight: 900,
+  padding: '10px 14px',
+  borderRadius: '999px',
+  background: '#fff',
+  border: '1px solid #ffedd5',
+} as const;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return <html lang="ru"><body>{children}
         <nav
-          aria-label="Индексируемые страницы Тотоша"
-          style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
+          aria-label="Разделы сайта Тотоша"
+          style={{
+            width: 'min(1120px, calc(100% - 40px))',
+            margin: '0 auto',
+            padding: '24px 0 38px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '12px',
+            alignItems: 'center',
+            borderTop: '1px solid #fed7aa',
+          }}
         >
-          <a href="/">Главная</a>
-          <a href="/about">О нас</a>
-          <a href="/programs">Программы</a>
-          <a href="/parents">Родителям</a>
-          <a href="/cabinet">Технологии</a>
-          <a href="/franchise">Франшиза</a>
-          <a href="/contacts">Контакты</a>
-          <a href="/life">Жизнь Тотоша</a>
+          <span style={{ color: '#64748b', fontWeight: 900, marginRight: '4px' }}>Разделы сайта:</span>
+          <a style={indexLinkStyle} href="/">Главная</a>
+          <a style={indexLinkStyle} href="/about">О нас</a>
+          <a style={indexLinkStyle} href="/programs">Программы</a>
+          <a style={indexLinkStyle} href="/parents">Родителям</a>
+          <a style={indexLinkStyle} href="/cabinet">Технологии</a>
+          <a style={indexLinkStyle} href="/franchise">Франшиза</a>
+          <a style={indexLinkStyle} href="/contacts">Контакты</a>
+          <a style={indexLinkStyle} href="/life">Жизнь Тотоша</a>
         </nav>
         <script
           id="totosha-json-ld"
