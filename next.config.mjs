@@ -12,12 +12,6 @@ const nextConfig = {
         ],
       },
       {
-        source: '/_next/static/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
-      {
         source: '/:path*\\.(jpg|jpeg|png|webp|gif)',
         headers: [
           { key: 'Cache-Control', value: 'private, max-age=3600, must-revalidate' },
