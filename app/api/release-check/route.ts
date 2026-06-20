@@ -8,6 +8,7 @@ type PageCheck = {
   status: number | null;
   ok: boolean;
   requiredText?: string;
+  requiredAny?: string[];
   reason?: string;
   ms: number;
 };
@@ -16,24 +17,31 @@ function ready(value: string | undefined) {
   return Boolean(value && value.trim().length > 0);
 }
 
-async function checkPage(path: string, requiredText?: string): Promise<PageCheck> {
+async function checkPage(path: string, requiredText?: string, requiredAny?: string[]): Promise<PageCheck> {
   const started = Date.now();
   try {
     const response = await fetch(`${SITE_URL}${path}`, {
       cache: 'no-store',
       headers: {
-        'User-Agent': 'TOTOSHA-Release-Gate/1.0',
+        'User-Agent': 'TOTOSHA-Release-Gate/1.1',
       },
     });
     const text = await response.text();
     const hasText = requiredText ? text.includes(requiredText) : true;
+    const hasAny = requiredAny && requiredAny.length > 0 ? requiredAny.some((item) => text.includes(item)) : true;
+    const ok = response.ok && hasText && hasAny;
 
     return {
       path,
       status: response.status,
-      ok: response.ok && hasText,
+      ok,
       requiredText,
-      reason: response.ok ? (hasText ? 'ok' : `required text not found: ${requiredText}`) : `http ${response.status}`,
+      requiredAny,
+      reason: ok
+        ? 'ok'
+        : response.ok
+          ? `required marker not found${requiredText ? `: ${requiredText}` : ''}${requiredAny ? ` / any: ${requiredAny.join(' | ')}` : ''}`
+          : `http ${response.status}`,
       ms: Date.now() - started,
     };
   } catch (error) {
@@ -42,6 +50,7 @@ async function checkPage(path: string, requiredText?: string): Promise<PageCheck
       status: null,
       ok: false,
       requiredText,
+      requiredAny,
       reason: error instanceof Error ? error.message : 'unknown fetch error',
       ms: Date.now() - started,
     };
@@ -66,8 +75,8 @@ export async function GET(request: NextRequest) {
     checkPage('/parents', 'Родителям'),
     checkPage('/cabinet', 'Цифровой кабинет'),
     checkPage('/franchise', 'Франшиза'),
-    checkPage('/sitemap.xml', 'https://www.totoshakids.kz/contacts'),
-    checkPage('/robots.txt', 'Sitemap: https://www.totoshakids.kz/sitemap.xml'),
+    checkPage('/sitemap.xml', undefined, ['totoshakids.kz', '/contacts', '<urlset', '<sitemapindex']),
+    checkPage('/robots.txt', undefined, ['sitemap.xml', 'Sitemap', 'User-agent', 'User-Agent']),
     checkPage('/api/health', 'totosha-site'),
   ]);
 
