@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/totosha-media/'],
       },
     ],
-    sitemap: 'https://www.totoshakids.kz/sitemap.xml',
+    sitemap: 'https://www.totoshakids.kz/sitemap-totosha.xml',
     host: 'https://www.totoshakids.kz',
   };
 }
