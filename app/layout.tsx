@@ -1,7 +1,22 @@
 import type { Metadata } from 'next';
+import { Cormorant_Garamond, Manrope } from 'next/font/google';
 import './globals.css';
 import './v035.css';
 import './seo.css';
+import './premium.css';
+
+const premiumSerif = Cormorant_Garamond({
+  subsets: ['cyrillic', 'latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-premium-serif',
+  display: 'swap',
+});
+
+const premiumSans = Manrope({
+  subsets: ['cyrillic', 'latin'],
+  variable: '--font-premium-sans',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.totoshakids.kz'),
@@ -11,9 +26,7 @@ export const metadata: Metadata = {
   },
   description: 'Тотоша — современный частный детский сад в Астане: видеонаблюдение, логопед, английский язык, дополнительные занятия и поэтапно развиваемая цифровая экосистема.',
   keywords: ['детский сад Астана','Тотоша','частный детский сад','детский сад с видеонаблюдением','логопед Астана','подготовка к школе','детский сад левый берег','садик Астана'],
-  alternates: {
-    canonical: '/',
-  },
+  alternates: { canonical: '/' },
   icons: {
     icon: [
       { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
@@ -43,7 +56,10 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return <html lang="ru"><body>{children}
+  return (
+    <html lang="ru" className={`${premiumSerif.variable} ${premiumSans.variable}`}>
+      <body>
+        {children}
         <nav
           aria-label="Индексируемые страницы Тотоша"
           style={{ position: 'absolute', left: '-10000px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
@@ -91,42 +107,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <script
-          id="totosha-header-real-links-v037"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var routes = {
-                  'Главная': '/',
-                  'О нас': '/about',
-                  'Программы': '/programs',
-                  'Родителям': '/parents',
-                  'Технологии': '/cabinet',
-                  'Цифровой кабинет': '/cabinet',
-                  'Франшиза': '/franchise',
-                  'Контакты': '/contacts',
-                  'Записаться': '/contacts'
-                };
-
-                document.addEventListener('click', function(event) {
-                  var target = event.target;
-                  var button = target && target.closest ? target.closest('.header button') : null;
-                  if (!button) return;
-
-                  var text = (button.textContent || '').replace(/\s+/g, ' ').trim();
-                  var href = routes[text];
-                  if (!href) return;
-
-                  if (window.location.pathname === href) return;
-                  event.preventDefault();
-                  event.stopPropagation();
-                  if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-                  window.location.assign(href);
-                }, true);
-              })();
-            `,
-          }}
-        />
-        <script
           id="totosha-photo-protection"
           dangerouslySetInnerHTML={{
             __html: `
@@ -135,11 +115,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               });
               document.addEventListener('dragstart', function(e) {
                 if (e.target && e.target.tagName === 'IMG') e.preventDefault();
-              });
-              document.addEventListener('keydown', function(e) {
-                if ((e.ctrlKey || e.metaKey) && ['s','u','p'].includes(e.key.toLowerCase())) {
-                  e.preventDefault();
-                }
               });
             `,
           }}
@@ -176,5 +151,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-      </body></html>;
+      </body>
+    </html>
+  );
 }
