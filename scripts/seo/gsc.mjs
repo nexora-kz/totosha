@@ -6,6 +6,8 @@ const TOKEN_URL = "https://oauth2.googleapis.com/token";
 const WEBMASTERS_API = "https://www.googleapis.com/webmasters/v3";
 const INSPECTION_API = "https://searchconsole.googleapis.com/v1";
 const SCOPE = "https://www.googleapis.com/auth/webmasters.readonly";
+const REPORT_DAYS = 28;
+const DATA_LAG_DAYS = 1;
 
 function base64url(value) {
   return Buffer.from(value)
@@ -186,10 +188,13 @@ async function main() {
     ? "workload_identity_federation"
     : "service_account_json";
   const token = federatedToken || (await accessToken(account));
-  const endDate = daysAgo(3);
-  const startDate = daysAgo(30);
-  const previousEndDate = daysAgo(31);
-  const previousStartDate = daysAgo(58);
+
+  // Берём последние 28 календарных дней, заканчивая вчерашним днём.
+  // dataState: "all" позволяет Google вернуть уже доступные свежие данные.
+  const endDate = daysAgo(DATA_LAG_DAYS);
+  const startDate = daysAgo(DATA_LAG_DAYS + REPORT_DAYS - 1);
+  const previousEndDate = daysAgo(DATA_LAG_DAYS + REPORT_DAYS);
+  const previousStartDate = daysAgo(DATA_LAG_DAYS + REPORT_DAYS * 2 - 1);
 
   try {
     const [currentRaw, previousRaw, queriesRaw, pagesRaw, sitemaps] =
@@ -234,6 +239,8 @@ async function main() {
       authMode,
       generatedAt: new Date().toISOString(),
       property: SEARCH_CONSOLE_SITE_URL,
+      reportDays: REPORT_DAYS,
+      dataLagDays: DATA_LAG_DAYS,
       period: { startDate, endDate },
       previousPeriod: {
         startDate: previousStartDate,
