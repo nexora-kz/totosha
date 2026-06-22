@@ -7,6 +7,7 @@ const WEBMASTERS_API = "https://www.googleapis.com/webmasters/v3";
 const INSPECTION_API = "https://searchconsole.googleapis.com/v1";
 const SCOPE = "https://www.googleapis.com/auth/webmasters.readonly";
 const REPORT_DAYS = 28;
+const WEEK_DAYS = 7;
 const DATA_LAG_DAYS = 1;
 
 function base64url(value) {
@@ -52,14 +53,13 @@ async function accessToken(account) {
     .replace(/=/g, "")
     .replace(/\+/g, "-")
     .replace(/\//g, "_");
-  const assertion = `${unsigned}.${signature}`;
 
   const response = await fetch(TOKEN_URL, {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
       grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-      assertion,
+      assertion: `${unsigned}.${signature}`,
     }),
   });
   const data = await response.json();
@@ -79,6 +79,13 @@ function daysAgo(days) {
   return isoDate(date);
 }
 
+function period(days, offset = DATA_LAG_DAYS) {
+  return {
+    startDate: daysAgo(offset + days - 1),
+    endDate: daysAgo(offset),
+  };
+}
+
 async function googleRequest(token, url, options = {}) {
   const response = await fetch(url, {
     ...options,
@@ -89,7 +96,7 @@ async function googleRequest(token, url, options = {}) {
     },
   });
   const text = await response.text();
-  let data = null;
+  let data;
   try {
     data = text ? JSON.parse(text) : {};
   } catch {
@@ -101,7 +108,7 @@ async function googleRequest(token, url, options = {}) {
   return data;
 }
 
-async function searchAnalytics(token, startDate, endDate, dimensions = []) {
+async function searchAnalytics(token, range, dimensions = []) {
   const site = encodeURIComponent(SEARCH_CONSOLE_SITE_URL);
   return googleRequest(
     token,
@@ -109,8 +116,8 @@ async function searchAnalytics(token, startDate, endDate, dimensions = []) {
     {
       method: "POST",
       body: JSON.stringify({
-        startDate,
-        endDate,
+        startDate: range.startDate,
+        endDate: range.endDate,
         dimensions,
         rowLimit: dimensions.length ? 100 : 1,
         dataState: "all",
@@ -168,6 +175,26 @@ async function writeUnavailableReport(output, reason, details = null) {
   console.log(reason);
 }
 
+function mapQueries(rows = []) {
+  return rows.slice(0, 25).map((row) => ({
+    query: row.keys?.[0] ?? "",
+    clicks: row.clicks ?? 0,
+    impressions: row.impressions ?? 0,
+    ctr: row.ctr ?? 0,
+    position: row.position ?? 0,
+  }));
+}
+
+function mapPages(rows = []) {
+  return rows.slice(0, 25).map((row) => ({
+    page: row.keys?.[0] ?? "",
+    clicks: row.clicks ?? 0,
+    impressions: row.impressions ?? 0,
+    ctr: row.ctr ?? 0,
+    position: row.position ?? 0,
+  }));
+}
+
 async function main() {
   const output = process.argv[2] || "gsc-report.json";
   const federatedToken = process.env.GOOGLE_OAUTH_ACCESS_TOKEN?.trim();
@@ -189,25 +216,37 @@ async function main() {
     : "service_account_json";
   const token = federatedToken || (await accessToken(account));
 
-  // Берём последние 28 календарных дней, заканчивая вчерашним днём.
-  // dataState: "all" позволяет Google вернуть уже доступные свежие данные.
-  const endDate = daysAgo(DATA_LAG_DAYS);
-  const startDate = daysAgo(DATA_LAG_DAYS + REPORT_DAYS - 1);
-  const previousEndDate = daysAgo(DATA_LAG_DAYS + REPORT_DAYS);
-  const previousStartDate = daysAgo(DATA_LAG_DAYS + REPORT_DAYS * 2 - 1);
+  const currentPeriod = period(REPORT_DAYS);
+  const previousPeriod = period(REPORT_DAYS, DATA_LAG_DAYS + REPORT_DAYS);
+  const weeklyPeriod = period(WEEK_DAYS);
+  const previousWeeklyPeriod = period(
+    WEEK_DAYS,
+    DATA_LAG_DAYS + WEEK_DAYS,
+  );
 
   try {
-    const [currentRaw, previousRaw, queriesRaw, pagesRaw, sitemaps] =
-      await Promise.all([
-        searchAnalytics(token, startDate, endDate),
-        searchAnalytics(token, previousStartDate, previousEndDate),
-        searchAnalytics(token, startDate, endDate, ["query"]),
-        searchAnalytics(token, startDate, endDate, ["page"]),
-        sitemapStatus(token),
-      ]);
+    const [
+      currentRaw,
+      previousRaw,
+      queriesRaw,
+      pagesRaw,
+      sitemaps,
+      weeklyRaw,
+      previousWeeklyRaw,
+    ] = await Promise.all([
+      searchAnalytics(token, currentPeriod),
+      searchAnalytics(token, previousPeriod),
+      searchAnalytics(token, currentPeriod, ["query"]),
+      searchAnalytics(token, currentPeriod, ["page"]),
+      sitemapStatus(token),
+      searchAnalytics(token, weeklyPeriod),
+      searchAnalytics(token, previousWeeklyPeriod),
+    ]);
 
     const current = totals(currentRaw.rows?.[0]);
     const previous = totals(previousRaw.rows?.[0]);
+    const currentWeek = totals(weeklyRaw.rows?.[0]);
+    const previousWeek = totals(previousWeeklyRaw.rows?.[0]);
 
     const inspections = [];
     for (const page of PAGES) {
@@ -241,28 +280,20 @@ async function main() {
       property: SEARCH_CONSOLE_SITE_URL,
       reportDays: REPORT_DAYS,
       dataLagDays: DATA_LAG_DAYS,
-      period: { startDate, endDate },
-      previousPeriod: {
-        startDate: previousStartDate,
-        endDate: previousEndDate,
-      },
+      period: currentPeriod,
+      previousPeriod,
       totals: current,
       previousTotals: previous,
       comparison: compare(current, previous),
-      topQueries: (queriesRaw.rows ?? []).slice(0, 25).map((row) => ({
-        query: row.keys?.[0] ?? "",
-        clicks: row.clicks,
-        impressions: row.impressions,
-        ctr: row.ctr,
-        position: row.position,
-      })),
-      topPages: (pagesRaw.rows ?? []).slice(0, 25).map((row) => ({
-        page: row.keys?.[0] ?? "",
-        clicks: row.clicks,
-        impressions: row.impressions,
-        ctr: row.ctr,
-        position: row.position,
-      })),
+      weekly: {
+        period: weeklyPeriod,
+        previousPeriod: previousWeeklyPeriod,
+        totals: currentWeek,
+        previousTotals: previousWeek,
+        comparison: compare(currentWeek, previousWeek),
+      },
+      topQueries: mapQueries(queriesRaw.rows),
+      topPages: mapPages(pagesRaw.rows),
       sitemaps: sitemaps.sitemap ?? [],
       inspections,
     };
@@ -274,6 +305,7 @@ async function main() {
           authMode,
           period: report.period,
           totals: report.totals,
+          weekly: report.weekly,
           inspectedPages: inspections.length,
         },
         null,
@@ -293,7 +325,7 @@ async function main() {
   }
 }
 
-main().catch(async (error) => {
+main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
