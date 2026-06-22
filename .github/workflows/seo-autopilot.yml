@@ -12,10 +12,13 @@ on:
       - "public/**"
       - "components/**"
       - "data/**"
+      - "lib/**"
       - "scripts/seo/**"
+      - ".github/workflows/seo-autopilot.yml"
 
 permissions:
   contents: read
+  statuses: read
 
 concurrency:
   group: totosha-seo-autopilot
@@ -25,16 +28,22 @@ jobs:
   seo:
     name: Monitor, report and notify search engines
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
+      - name: Use Node.js 24
+        uses: actions/setup-node@v5
         with:
-          node-version: "20"
+          node-version: "24"
+
+      - name: Wait for Vercel production deployment
+        if: github.event_name == 'push'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/seo/wait-for-vercel.mjs
 
       - name: Technical SEO monitor
         id: monitor
@@ -50,7 +59,7 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: node scripts/seo/gsc.mjs gsc-report.json
 
-      - name: Notify IndexNow after site changes
+      - name: Notify IndexNow after deployed site changes
         if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
         continue-on-error: true
         run: node scripts/seo/indexnow.mjs
@@ -65,7 +74,7 @@ jobs:
 
       - name: Upload SEO report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: totosha-seo-report-${{ github.run_number }}
           path: |
