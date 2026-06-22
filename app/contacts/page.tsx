@@ -10,9 +10,10 @@ export const metadata: Metadata = {
 export default function ContactsSeoPage() {
   return (
     <SeoLanding
+      variant="contacts"
       eyebrow="Контакты"
-      title="Связаться с детским садом Тотоша в Астане"
-      description="Оставьте обращение, напишите в WhatsApp или позвоните заведующей. Сначала мы уточним возраст ребёнка и вопросы семьи, затем предложим удобное время экскурсии."
+      title="Будем рады познакомиться"
+      description="Напишите в WhatsApp или позвоните заведующей. Мы ответим на вопросы и предложим удобное время экскурсии."
       bullets={[
         'Адрес: Астана, ул. Алихана Бокейхана, 29А',
         'Телефон: +7 (776) 700-29-29',
@@ -54,6 +55,7 @@ export default function ContactsSeoPage() {
         },
       ]}
       cta="Написать в WhatsApp"
+      whatsappIntent="Здравствуйте. Хочу записаться на экскурсию в Тотоша и уточнить удобное время."
     />
   );
 }

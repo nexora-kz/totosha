@@ -1,0 +1,28 @@
+.premium-journey-photo,
+.premium-visual-about .premium-photo-frame,
+.premium-visual-programs .premium-photo-frame,
+.premium-visual-parents .premium-photo-frame {
+  background-image: url('/generated/hero');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.premium-journey-photo img,
+.premium-visual-about .premium-photo-frame img,
+.premium-visual-programs .premium-photo-frame img,
+.premium-visual-parents .premium-photo-frame img {
+  opacity: 0;
+}
+
+.premium-visual-about .premium-photo-frame {
+  background-position: center 28%;
+}
+
+.premium-visual-programs .premium-photo-frame {
+  background-position: center 38%;
+}
+
+.premium-visual-parents .premium-photo-frame {
+  background-position: center 32%;
+}
