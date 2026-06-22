@@ -1,43 +1,58 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
-  ArrowUp,
+  ArrowUpRight,
   Baby,
-  Bell,
+  BookOpen,
+  CalendarDays,
   Camera,
-  ChevronRight,
-  ClipboardCheck,
+  Check,
+  Clock3,
   CreditCard,
-  Dumbbell,
   HeartHandshake,
-  Image as ImageIcon,
   Languages,
-  LayoutDashboard,
   MapPin,
-  Menu,
   MessageCircle,
-  Mic,
+  Music2,
   Phone,
   Send,
   ShieldCheck,
   Sparkles,
+  Sprout,
+  Star,
   Stethoscope,
-  Utensils,
-  Video,
-  X,
+  Users,
 } from 'lucide-react';
+import { PremiumFooter } from '../components/PremiumFooter';
+import { PremiumHeader } from '../components/PremiumHeader';
 import { HOME_GALLERY, TOTOSHA_CONTACTS } from '../lib/totoshaConfig';
-import styles from './wave1.module.css';
 
-const nav = [
-  ['/about', 'О нас'],
-  ['/programs', 'Программы'],
-  ['/parents', 'Родителям'],
-  ['/cabinet', 'Технологии'],
-  ['/franchise', 'Франшиза'],
-  ['/contacts', 'Контакты'],
-] as const;
+const journeySteps = [
+  { icon: MapPin, title: 'Экскурсия', text: 'Покажем пространство и ответим на вопросы' },
+  { icon: Users, title: 'Знакомство с группой', text: 'Расскажем о режиме и ежедневных процессах' },
+  { icon: HeartHandshake, title: 'Первые дни', text: 'Подберём спокойный формат знакомства' },
+  { icon: MessageCircle, title: 'Обратная связь', text: 'Остаёмся на связи с семьёй' },
+  { icon: Camera, title: 'Фотоотчёты', text: 'Закрытый формат запускается поэтапно' },
+  { icon: CreditCard, title: 'Оплаты и документы', text: 'Подключаются после безопасного пилота' },
+];
+
+const services = [
+  { icon: Languages, title: 'Английский', text: 'Игровые занятия, песни и простые фразы по расписанию.' },
+  { icon: Stethoscope, title: 'Логопед', text: 'Поддержка речи и уверенного общения в согласованном формате.' },
+  { icon: Sprout, title: 'Хореография', text: 'Движение, координация, грация и чувство ритма.' },
+  { icon: Music2, title: 'Вокал', text: 'Музыка, слух, голос и уверенность в самовыражении.' },
+  { icon: ShieldCheck, title: 'Таэквондо', text: 'Физическая активность, дисциплина и уважение к правилам.' },
+  { icon: BookOpen, title: 'Подготовка к школе', text: 'Речь, мышление, внимание и базовые учебные навыки.' },
+];
+
+const features = [
+  { icon: Clock3, title: '07:30–19:00', text: 'Понятный режим полного дня' },
+  { icon: Users, title: '3 группы', text: 'Младшая, средняя и старшая' },
+  { icon: Languages, title: 'Английский', text: 'Занятия в игровой форме' },
+  { icon: Stethoscope, title: 'Логопед', text: 'Поддержка речи и общения' },
+  { icon: Camera, title: 'Видеонаблюдение', text: 'Доступ в установленном формате' },
+];
 
 const intentOptions = [
   'Записаться на экскурсию',
@@ -50,11 +65,6 @@ function whatsappUrl(text: string) {
   return `${TOTOSHA_CONTACTS.whatsappUrl}?text=${encodeURIComponent(text)}`;
 }
 
-function scrollTop() {
-  document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
-  document.body.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 function track(event: string, payload: Record<string, unknown> = {}) {
   if (typeof window === 'undefined') return;
   const analyticsWindow = window as Window & { dataLayer?: Record<string, unknown>[] };
@@ -62,118 +72,240 @@ function track(event: string, payload: Record<string, unknown> = {}) {
   analyticsWindow.dataLayer.push({ event, ...payload });
 }
 
-function IconBox({ children }: { children: React.ReactNode }) {
-  return <div className="icon">{children}</div>;
-}
-
-function SectionTitle({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) {
-  return <div className="section-title"><div className="eyebrow">{eyebrow}</div><h2>{title}</h2>{text && <p className="lead">{text}</p>}</div>;
-}
-
-function Card({ icon, title, text, tags }: { icon: React.ReactNode; title: string; text: string; tags?: string[] }) {
-  return <article className="card"><IconBox>{icon}</IconBox><h3>{title}</h3><p>{text}</p>{tags && <div className="feature-list">{tags.map((tag) => <span className="tag" key={tag}>{tag}</span>)}</div>}</article>;
-}
-
-function Header() {
-  const [open, setOpen] = useState(false);
-  return <header className="header"><div className="container"><div className="nav"><a className="brand" href="/" aria-label="На главную Тотоша"><div className="logo"><Baby size={25} /></div><div><div className="brand-title">Тотоша</div><div className="brand-sub">детский сад нового поколения</div></div></a><nav className="links" aria-label="Основная навигация">{nav.map(([href, label]) => <a href={href} key={href}>{label}</a>)}</nav><div className="actions"><a className="btn btn-light" href="/parents">Родителям</a><a className="btn btn-dark" href="/contacts">Записаться</a></div><button className="mobile-btn" type="button" aria-label={open ? 'Закрыть меню' : 'Открыть меню'} onClick={() => setOpen((value) => !value)}>{open ? <X /> : <Menu />}</button></div><div className={`mobile-menu ${open ? 'open' : ''}`}><a href="/">Главная</a>{nav.map(([href, label]) => <a href={href} key={href}>{label}</a>)}</div></div></header>;
-}
-
-function Hero() {
-  const facts = [['07:30–19:00', 'режим полного дня'], ['Полдня', 'доступный формат посещения'], ['3 группы', 'по возрасту детей'], ['Астана', 'ул. Алихана Бокейхана, 29А']];
-  return <section className="hero"><div className="orb1" /><div className="orb2" /><div className="container hero-grid"><div><div className="badge"><Sparkles size={17} /> Частный детский сад в Астане</div><h1>Тотоша — место, где забота стала системой</h1><p className="lead">Безопасность, развитие, понятный режим и открытая связь с семьёй. Мы не обещаем лишнего — показываем, как устроен детский сад сегодня и что развивается поэтапно.</p><div className="hero-actions"><a className="btn btn-primary" href={whatsappUrl('Здравствуйте. Хочу записаться на экскурсию в Тотоша.')} onClick={() => track('cta_whatsapp', { location: 'hero', intent: 'excursion' })}>Записаться на экскурсию <ChevronRight size={20} /></a><a className="btn btn-light" href="#family-path">Как проходит знакомство</a></div><div className={styles.trustStrip}>{facts.map(([title, text]) => <div className={styles.trustItem} key={title}><strong>{title}</strong><span>{text}</span></div>)}</div></div><div className={styles.honestPanel}><small>Цифровая экосистема Тотоша</small><h3>Запускается поэтапно после тестирования</h3>{[['Приход и уход ребёнка', 'тестирование'], ['Уведомления родителям', 'подготовлено'], ['Фотоотчёты', 'закрытый доступ'], ['Оплаты и документы', 'следующий этап']].map(([label, status]) => <div className={styles.statusRow} key={label}><span>{label}</span><span className={styles.status}>{status}</span></div>)}</div></div></section>;
-}
-
-function Why() {
-  const items = [
-    [<Video key="video" />, 'Видеонаблюдение', 'Возможность наблюдать за ребёнком в доступном для родителей формате.', ['Работает']],
-    [<Stethoscope key="doctor" />, 'Врач-педиатр', 'Внимание к самочувствию и индивидуальным особенностям ребёнка.', ['По графику']],
-    [<MessageCircle key="speech" />, 'Логопед', 'Поддержка речи, общения и уверенности ребёнка.', ['Дополнительное направление']],
-    [<Languages key="language" />, 'Английский язык', 'Знакомство с языком через игру и ежедневную коммуникацию.', ['В программе']],
-    [<Mic key="music" />, 'Вокал и хореография', 'Музыка, движение, чувство ритма и самовыражение.', ['В программе']],
-    [<Dumbbell key="sport" />, 'Таэквондо', 'Физическая активность, координация и дисциплина.', ['В программе']],
-    [<Utensils key="food" />, 'Питание', 'Режим питания и фиксация индивидуальных особенностей ребёнка.', ['Уточняется при зачислении']],
-    [<HeartHandshake key="contact" />, 'Связь с семьёй', 'WhatsApp, телефон, экскурсия и личное общение с заведующей.', ['Доступно сейчас']],
-  ] as const;
-  return <section className="section white"><div className="container"><SectionTitle eyebrow="Что получает семья" title="Понятные условия без рекламных преувеличений" text="Перед зачислением родители знакомятся с пространством, режимом, группой и правилами детского сада." /><div className="grid grid-4">{items.map(([icon, title, text, tags]) => <Card key={title} icon={icon} title={title} text={text} tags={[...tags]} />)}</div></div></section>;
-}
-
-function Development() {
-  const items = [['🧠', 'Мышление и логика', 'Внимание, память, анализ и самостоятельное мышление.'], ['🗣', 'Речь и коммуникация', 'Уверенное общение, взаимодействие и развитие речи.'], ['🎨', 'Творческое развитие', 'Воображение, музыка, творчество и самовыражение.'], ['🤸', 'Физическая активность', 'Движение, дисциплина, энергия и координация.'], ['❤️', 'Эмоциональное развитие', 'Уверенность, самостоятельность и спокойная адаптация.'], ['🎓', 'Подготовка к школе', 'Чтение, письмо, математика и интерес к знаниям.']];
-  return <section className="section"><div className="container"><SectionTitle eyebrow="Развитие ребёнка" title="Развитие через интерес и устойчивый режим" /><div className="grid grid-3">{items.map(([emoji, title, text]) => <Card key={title} icon={<span style={{ fontSize: 24 }}>{emoji}</span>} title={title} text={text} />)}</div></div></section>;
-}
-
-function Day() {
-  const rows = [['07:30', 'Приём детей'], ['08:30', 'Завтрак'], ['09:00', 'Развивающие занятия'], ['10:30', 'Прогулка'], ['12:00', 'Обед'], ['13:00', 'Отдых'], ['15:30', 'Полдник'], ['16:00', 'Дополнительные занятия'], ['17:30', 'Игры и свободная деятельность'], ['19:00', 'Завершение дня']];
-  return <section className="section white"><div className="container split"><div><SectionTitle eyebrow="Режим дня" title="Предсказуемый день помогает ребёнку адаптироваться" text="Фактический режим группы может корректироваться по возрасту и потребностям детей." /><div className="premium-band"><h3>Форматы посещения</h3><p>Полдня и полный день. Подходящий вариант подбирается после знакомства с ребёнком и семьёй.</p></div></div><div className="timeline">{rows.map(([time, label]) => <div className="time-row" key={time}><div className="time">{time}</div><b>{label}</b></div>)}</div></div></section>;
-}
-
-function DigitalStatus() {
-  const items = [
-    [<ClipboardCheck key="attendance" />, 'Посещаемость', 'События прихода и ухода проходят техническое тестирование.', ['Тестирование']],
-    [<Bell key="notification" />, 'Уведомления', 'Подготовлена логика уведомлений для родителей.', ['Подготовлено']],
-    [<Camera key="photo" />, 'Фотоотчёты', 'Планируется закрытый доступ только для своей семьи.', ['Следующий этап']],
-    [<CreditCard key="payments" />, 'Оплаты', 'Баланс, история и напоминания будут подключаться после пилота.', ['Следующий этап']],
-    [<LayoutDashboard key="team" />, 'Приложение персонала', 'Сотрудники смогут отмечать события со смартфона без отдельного компьютера.', ['Прототип готов']],
-    [<ShieldCheck key="security" />, 'Доступ и безопасность', 'Роли, журнал действий и раздельный доступ заложены в архитектуру.', ['Подготовлено']],
-  ] as const;
-  return <section className="section dark"><div className="container"><SectionTitle eyebrow="Технологии" title="Честный статус цифровых функций" text="Полный кабинет ещё не запущен для всех родителей. Сначала мы тестируем безопасность и реальные сценарии на небольшой группе." /><div className="grid grid-3">{items.map(([icon, title, text, tags]) => <Card key={title} icon={icon} title={title} text={text} tags={[...tags]} />)}</div><div className="hero-actions" style={{ marginTop: 24 }}><a className="btn btn-light" href="/cabinet">Подробнее о развитии экосистемы</a></div></div></section>;
-}
-
-function FamilyPath() {
-  const steps = [['1', 'Заявка', 'Вы оставляете телефон и выбираете тему обращения.'], ['2', 'Связь', 'Заведующая уточняет возраст ребёнка и отвечает на вопросы.'], ['3', 'Экскурсия', 'Вы знакомитесь с пространством, режимом и правилами.'], ['4', 'Решение', 'После знакомства выбирается группа и формат посещения.']];
-  return <section id="family-path" className="section"><div className="container"><SectionTitle eyebrow="После заявки" title="Понятный путь семьи без давления" text="Заявка не обязывает к зачислению. Сначала знакомство, ответы на вопросы и только потом решение." /><div className={styles.processGrid}>{steps.map(([number, title, text]) => <article className={styles.processStep} key={number}><div className={styles.processNumber}>{number}</div><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>;
-}
-
-function LeadForm() {
+function PremiumLeadForm() {
   const [name, setName] = useState('');
   const [digits, setDigits] = useState('');
   const [intent, setIntent] = useState<(typeof intentOptions)[number]>('Записаться на экскурсию');
   const [comment, setComment] = useState('');
   const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState('');
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
   const phone = `+7 ${[digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 8), digits.slice(8, 10)].filter(Boolean).join(' ')}`;
-  const message = `Здравствуйте. Меня зовут ${name.trim() || 'родитель'}. ${intent}. Телефон: ${phone}${comment.trim() ? `. Комментарий: ${comment.trim()}` : ''}`;
+  const fallbackText = `Здравствуйте. Меня зовут ${name.trim() || 'родитель'}. ${intent}. Телефон: ${phone}${comment.trim() ? `. Комментарий: ${comment.trim()}` : ''}`;
 
   async function submit() {
-    setError(''); setSent(false);
-    if (!name.trim()) return setError('Введите имя.');
-    if (digits.length !== 10) return setError('Введите ровно 10 цифр телефона после +7.');
-    if (!consent) return setError('Подтвердите согласие на обработку данных для обратной связи.');
-    const payload = { name: name.trim(), phone, intent, comment: comment.trim(), source: 'totoshakids.kz', path: window.location.pathname, date: new Date().toISOString() };
-    setSending(true); track('lead_submit_started', { intent, path: payload.path });
+    setMessage(null);
+    if (!name.trim()) return setMessage({ type: 'error', text: 'Введите имя.' });
+    if (digits.length !== 10) return setMessage({ type: 'error', text: 'Введите 10 цифр телефона после +7.' });
+    if (!consent) return setMessage({ type: 'error', text: 'Подтвердите согласие на обработку контактных данных.' });
+
+    const payload = {
+      name: name.trim(),
+      phone,
+      intent,
+      comment: comment.trim(),
+      source: 'totoshakids.kz premium',
+      path: window.location.pathname,
+      date: new Date().toISOString(),
+    };
+
+    setSending(true);
+    track('premium_lead_started', { intent });
+
     try {
-      const response = await fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-      if (!response.ok) throw new Error(`Lead API returned ${response.status}`);
-      try {
-        const old = JSON.parse(localStorage.getItem('totosha_leads') || '[]');
-        localStorage.setItem('totosha_leads', JSON.stringify([payload, ...old].slice(0, 20)));
-      } catch {}
-      setSent(true); track('lead_submit_success', { intent, path: payload.path });
+      const response = await fetch('/api/leads', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json().catch(() => null) as null | {
+        ok?: boolean;
+        stored?: boolean;
+        telegram?: { sent?: boolean };
+      };
+      const delivered = Boolean(result?.ok && (result.stored || result.telegram?.sent));
+      if (!response.ok || !delivered) throw new Error('delivery failed');
+
+      setMessage({ type: 'success', text: 'Заявка доставлена. Заведующая свяжется с вами, чтобы согласовать удобное время.' });
+      setComment('');
+      track('premium_lead_success', { intent });
     } catch {
-      setError('Не удалось отправить автоматически. Напишите нам в WhatsApp или позвоните — сообщение уже подготовлено.');
-      track('lead_submit_fallback', { intent, path: payload.path });
-    } finally { setSending(false); }
+      setMessage({ type: 'error', text: 'Автоматическая отправка временно недоступна. Используйте WhatsApp или звонок ниже.' });
+      track('premium_lead_fallback', { intent });
+    } finally {
+      setSending(false);
+    }
   }
 
-  return <div className="form"><h3>Записаться на знакомство</h3><label className={styles.formLabel} htmlFor="lead-name">Ваше имя</label><input id="lead-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Как к вам обращаться" /><label className={styles.formLabel} htmlFor="lead-phone">Телефон</label><div className="phone-wrap"><span className="phone-prefix">+7</span><input id="lead-phone" type="tel" inputMode="numeric" maxLength={10} value={digits} onChange={(event) => setDigits(event.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="7071230108" /></div><div className="phone-help">Введите 10 цифр после +7.</div><label className={styles.formLabel} htmlFor="lead-intent">Что вас интересует</label><select id="lead-intent" value={intent} onChange={(event) => setIntent(event.target.value as (typeof intentOptions)[number])}>{intentOptions.map((option) => <option key={option}>{option}</option>)}</select><label className={styles.formLabel} htmlFor="lead-comment">Комментарий</label><textarea id="lead-comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Возраст ребёнка или удобное время для звонка" rows={4} /><label className={styles.consent}><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>Согласен на обработку контактных данных для ответа на обращение. <a href="/privacy">Подробнее</a>.</span></label><button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 14 }} type="button" onClick={submit} disabled={sending}><Send size={18} /> {sending ? 'Отправляем...' : 'Отправить заявку'}</button>{error && <div className={styles.fallback}>{error}<div className={styles.successActions}><a className="btn btn-light" href={whatsappUrl(message)}>Написать в WhatsApp</a><a className="btn btn-light" href={TOTOSHA_CONTACTS.telUrl}>Позвонить</a></div></div>}{sent && <div className="success"><b>Заявка отправлена</b><p>Заведующая свяжется с вами для уточнения возраста ребёнка и удобного времени экскурсии.</p><div className={styles.successActions}><a className="btn btn-light" href={whatsappUrl(message)}>Дополнить в WhatsApp</a><a className="btn btn-light" href={TOTOSHA_CONTACTS.telUrl}>Позвонить сейчас</a></div></div>}</div>;
-}
+  return (
+    <div className="premium-lead-form">
+      <h3>Записаться на экскурсию</h3>
+      <p>Оставьте контакт — мы уточним возраст ребёнка и предложим удобное время.</p>
 
-function ContactsSection() {
-  const facts = [[<MapPin key="map" />, 'Адрес', 'Астана, ул. Алихана Бокейхана, 29А', TOTOSHA_CONTACTS.mapUrl], [<Phone key="phone" />, 'Телефон', TOTOSHA_CONTACTS.phoneDisplay, TOTOSHA_CONTACTS.telUrl], [<MessageCircle key="wa" />, 'WhatsApp', 'Быстрая связь с детским садом', whatsappUrl('Здравствуйте. Хочу узнать подробнее про Тотоша.')], [<ImageIcon key="instagram" />, 'Instagram', '@totoshakids', TOTOSHA_CONTACTS.instagramUrl]] as const;
-  return <section className="section white"><div className="container split"><div><SectionTitle eyebrow="Контакты" title="Свяжитесь удобным способом" text={`Основной контакт — ${TOTOSHA_CONTACTS.contactPerson}, ${TOTOSHA_CONTACTS.contactRole.toLowerCase()}.`} /><div className={styles.contactFacts}>{facts.map(([icon, title, text, href]) => <div className={styles.contactFact} key={title}><IconBox>{icon}</IconBox><div><strong>{title}</strong><a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>{text}</a></div></div>)}</div></div><LeadForm /></div></section>;
-}
+      <div className="premium-field">
+        <label htmlFor="premium-name">Ваше имя</label>
+        <input id="premium-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Как к вам обращаться" />
+      </div>
 
-function LifeTeaser() {
-  return <section id="life" className="home-life home-life-v035"><div className="home-life__text"><div className="eyebrow">Жизнь Тотоша</div><h2>Настоящие моменты детского сада</h2><p>Праздники, занятия и атмосфера заботы собраны в фотоархиве. Публично размещаются только выбранные материалы.</p><a className="btn btn-primary" href="/life">Открыть фотоархив</a></div><div className="home-life__photos">{HOME_GALLERY.map((item) => <span className="home-life__photo" key={item.src}><img src={item.src} alt={item.alt} draggable={false} /><span className="home-life__caption">{item.title}</span></span>)}</div></section>;
-}
+      <div className="premium-field">
+        <label htmlFor="premium-phone">Телефон</label>
+        <div className="premium-phone-field">
+          <span>+7</span>
+          <input id="premium-phone" type="tel" inputMode="numeric" maxLength={10} value={digits} onChange={(event) => setDigits(event.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="707 123 01 08" />
+        </div>
+      </div>
 
-function Footer() {
-  return <footer className="footer"><div className="container footer-row"><div><div className="brand-title">Тотоша</div><div className="brand-sub">Частный детский сад в Астане</div><div className={styles.footerMeta}>Алихана Бокейхана, 29А · Пн–Пт, 07:30–19:00</div></div><div className={styles.footerLinks}><a href="/contacts">Контакты</a><a href="/parents">Родителям</a><a href="/privacy">Обработка данных</a><a href={TOTOSHA_CONTACTS.instagramUrl} target="_blank" rel="noopener noreferrer">Instagram</a></div></div></footer>;
+      <div className="premium-field">
+        <label htmlFor="premium-intent">Что вас интересует</label>
+        <select id="premium-intent" value={intent} onChange={(event) => setIntent(event.target.value as (typeof intentOptions)[number])}>
+          {intentOptions.map((option) => <option key={option}>{option}</option>)}
+        </select>
+      </div>
+
+      <div className="premium-field">
+        <label htmlFor="premium-comment">Комментарий</label>
+        <textarea id="premium-comment" rows={3} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Возраст ребёнка или удобное время для звонка" />
+      </div>
+
+      <label className="premium-consent">
+        <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+        <span>Согласен на обработку контактных данных для ответа на обращение. <a href="/privacy">Подробнее</a>.</span>
+      </label>
+
+      <button className="premium-btn premium-btn-navy" type="button" onClick={submit} disabled={sending} style={{ width: '100%' }}>
+        <Send size={17} /> {sending ? 'Отправляем…' : 'Отправить заявку'}
+      </button>
+
+      {message && (
+        <div className={`premium-form-message ${message.type === 'success' ? 'is-success' : ''}`}>
+          {message.text}
+          {message.type === 'error' && (
+            <div className="premium-home-actions" style={{ marginTop: 12 }}>
+              <a className="premium-btn premium-btn-ghost" href={whatsappUrl(fallbackText)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a className="premium-btn premium-btn-ghost" href={TOTOSHA_CONTACTS.telUrl}>Позвонить</a>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function HomePage() {
-  return <div className="page"><Header /><main><Hero /><Why /><Development /><Day /><DigitalStatus /><FamilyPath /><LifeTeaser /><ContactsSection /></main><Footer /><div className="floating"><button className="float-btn float-top" aria-label="Наверх" onClick={scrollTop}><ArrowUp /></button></div><div className={styles.mobileDock} aria-label="Быстрая связь"><a href={whatsappUrl('Здравствуйте. Хочу узнать подробнее про Тотоша.')}><MessageCircle size={18} /> WhatsApp</a><a href={TOTOSHA_CONTACTS.telUrl}><Phone size={18} /> Позвонить</a></div></div>;
+  const excursionWhatsapp = whatsappUrl('Здравствуйте. Хочу записаться на экскурсию в Тотоша.');
+
+  return (
+    <main className="premium-site">
+      <PremiumHeader />
+
+      <section className="premium-home-hero">
+        <div className="premium-shell premium-home-grid">
+          <div className="premium-home-copy">
+            <div className="premium-eyebrow"><Star size={15} /> Современный детский сад в Астане</div>
+            <h1>Тотоша — место, где забота стала системой</h1>
+            <p>Безопасность, гармоничное развитие и понятный распорядок дня. Мы рядом с ребёнком и семьёй — открыто, бережно и каждый день.</p>
+            <div className="premium-home-actions">
+              <a className="premium-btn premium-btn-navy" href={excursionWhatsapp} target="_blank" rel="noopener noreferrer" onClick={() => track('premium_hero_whatsapp')}>
+                <CalendarDays size={18} /> Записаться на экскурсию
+              </a>
+              <a className="premium-btn premium-btn-ghost" href="#family-journey">
+                <Sparkles size={17} /> Как проходит знакомство
+              </a>
+            </div>
+            <div className="premium-trust-row">
+              <div className="premium-trust-item"><span><ShieldCheck size={18} /></span><div><strong>Безопасность</strong><small>Контроль и понятные правила</small></div></div>
+              <div className="premium-trust-item"><span><Users size={18} /></span><div><strong>Забота и развитие</strong><small>Три возрастные группы</small></div></div>
+              <div className="premium-trust-item"><span><MessageCircle size={18} /></span><div><strong>Открытая связь</strong><small>Телефон, WhatsApp, экскурсия</small></div></div>
+            </div>
+          </div>
+
+          <div className="premium-journey-stage" id="family-journey">
+            <div className="premium-journey-layout">
+              <div className="premium-journey-copy">
+                <small>Путь семьи в Тотоша</small>
+                <h2>Мы рядом<br />на каждом этапе</h2>
+                <div className="premium-journey-list">
+                  {journeySteps.map(({ icon: Icon, title, text }, index) => (
+                    <div className="premium-journey-step" key={title}>
+                      <b>{String(index + 1).padStart(2, '0')}</b>
+                      <div><strong>{title}</strong><small>{text}</small></div>
+                      <Icon size={18} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="premium-journey-photo">
+                <img src={HOME_GALLERY[0].src} alt="Атмосфера детского сада Тотоша" draggable={false} />
+                <div className="premium-journey-seal"><Baby size={27} /><strong>Забота и внимание — каждый день</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="premium-shell premium-feature-strip">
+          {features.map(({ icon: Icon, title, text }) => (
+            <div className="premium-feature" key={title}>
+              <span><Icon size={21} /></span>
+              <div><strong>{title}</strong><small>{text}</small></div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="premium-section premium-section-paper">
+        <div className="premium-shell">
+          <div className="premium-section-head">
+            <div className="premium-section-head-copy">
+              <div className="premium-eyebrow"><Sparkles size={15} /> Программы развития</div>
+              <h2>Баланс движения, творчества и познания</h2>
+              <p>Направления распределяются по расписанию группы. Актуальный график и формат занятий можно уточнить во время экскурсии.</p>
+            </div>
+            <a className="premium-btn premium-btn-ghost" href="/programs">Все программы <ArrowUpRight size={17} /></a>
+          </div>
+          <div className="premium-card-grid">
+            {services.map(({ icon: Icon, title, text }) => (
+              <article className="premium-service-card" key={title}>
+                <span className="premium-service-icon"><Icon size={23} /></span>
+                <h3>{title}</h3>
+                <p>{text}</p>
+                <a href="/programs">Подробнее <ArrowUpRight size={14} /></a>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="premium-section">
+        <div className="premium-shell premium-life-grid">
+          <div className="premium-life-copy">
+            <div className="premium-eyebrow"><Camera size={15} /> Жизнь Тотоша</div>
+            <h2>Настоящие моменты детского сада</h2>
+            <p>Праздники, занятия и атмосфера заботы собраны в фотоархиве. Публично размещаются только выбранные материалы.</p>
+            <div className="premium-home-actions"><a className="premium-btn premium-btn-navy" href="/life">Открыть фотоархив <ArrowUpRight size={17} /></a></div>
+          </div>
+          <div className="premium-life-collage">
+            {HOME_GALLERY.map((item) => (
+              <a className="premium-life-photo" href="/life" key={item.src}>
+                <img src={item.src} alt={item.alt} draggable={false} />
+                <span>{item.title}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="premium-section premium-section-paper">
+        <div className="premium-shell premium-contact-section">
+          <div className="premium-contact-copy">
+            <div className="premium-card-kicker premium-card-kicker-light">Контакты</div>
+            <h2>Будем рады познакомиться</h2>
+            <p>Основной контакт — Айшагуль Галымжановна, заведующая детским садом.</p>
+            <div className="premium-contact-list">
+              <a href={TOTOSHA_CONTACTS.telUrl}><span><Phone size={18} /></span>{TOTOSHA_CONTACTS.phoneDisplay}</a>
+              <a href={TOTOSHA_CONTACTS.mapUrl} target="_blank" rel="noopener noreferrer"><span><MapPin size={18} /></span>Астана, Алихана Бокейхана, 29А</a>
+              <div><span><Clock3 size={18} /></span>Пн–Пт · 07:30–19:00</div>
+            </div>
+          </div>
+          <PremiumLeadForm />
+        </div>
+      </section>
+
+      <PremiumFooter />
+      <div className="premium-mobile-dock">
+        <a className="premium-btn premium-btn-navy" href={excursionWhatsapp} target="_blank" rel="noopener noreferrer"><MessageCircle size={17} /> WhatsApp</a>
+        <a className="premium-btn premium-btn-gold" href={TOTOSHA_CONTACTS.telUrl}><Phone size={17} /> Позвонить</a>
+      </div>
+    </main>
+  );
 }
