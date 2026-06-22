@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/',
   },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', type: 'image/x-icon', sizes: '32x32' },
+      { url: '/icon.svg', type: 'image/svg+xml', sizes: 'any' },
+    ],
+    shortcut: '/favicon.ico',
+  },
   openGraph: {
     title: 'Тотоша — место, где забота стала системой',
     description: 'Современный детский сад в Астане: безопасность, развитие, технологии и забота.',
@@ -60,7 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               name: 'Тотоша',
               alternateName: 'Totosha Kids',
               url: 'https://www.totoshakids.kz',
-              logo: 'https://www.totoshakids.kz/icon.png',
+              logo: 'https://www.totoshakids.kz/icon.svg',
               description: 'Современный детский сад нового поколения в Астане с видеонаблюдением, цифровым кабинетом, логопедом, английским языком и дополнительными занятиями.',
               telephone: '+7 776 700 29 29',
               areaServed: 'Астана, Казахстан',
