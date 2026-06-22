@@ -19,6 +19,7 @@ on:
 permissions:
   contents: read
   statuses: read
+  id-token: write
 
 concurrency:
   group: totosha-seo-autopilot
@@ -53,10 +54,24 @@ jobs:
             --json seo-report.json \
             --markdown seo-report.md
 
+      - name: Authenticate to Google Cloud
+        id: google-auth
+        continue-on-error: true
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: totosha-seo-autopilot
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/webmasters.readonly
+          create_credentials_file: false
+          export_environment_variables: false
+
       - name: Google Search Console report
         continue-on-error: true
         env:
-          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          GOOGLE_OAUTH_ACCESS_TOKEN: ${{ steps.google-auth.outputs.access_token }}
+          GOOGLE_AUTH_OUTCOME: ${{ steps.google-auth.outcome }}
         run: node scripts/seo/gsc.mjs gsc-report.json
 
       - name: Notify IndexNow after deployed site changes
