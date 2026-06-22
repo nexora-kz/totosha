@@ -121,11 +121,16 @@ export async function POST(request: Request) {
   }
 
   const telegram = await notifyTelegram(lead);
+  const delivered = stored || telegram.sent;
 
-  return NextResponse.json({
-    ok: true,
-    stored,
-    storageReason: stored ? undefined : storageReason,
-    telegram,
-  }, { status: stored || telegram.sent ? 200 : 202 });
+  return NextResponse.json(
+    {
+      ok: delivered,
+      stored,
+      storageReason: stored ? undefined : storageReason,
+      telegram,
+      error: delivered ? undefined : 'Заявка не была доставлена автоматически',
+    },
+    { status: delivered ? 200 : 503 },
+  );
 }

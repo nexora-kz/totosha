@@ -1,0 +1,260 @@
+.trustStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.trustItem {
+  padding: 16px;
+  border: 1px solid rgba(36, 75, 66, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(12px);
+}
+
+.trustItem strong {
+  display: block;
+  color: #244b42;
+  font-size: 1rem;
+  margin-bottom: 4px;
+}
+
+.trustItem span {
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+.honestPanel {
+  border-radius: 28px;
+  padding: 28px;
+  background: linear-gradient(145deg, #244b42, #17362f);
+  color: #fff;
+  box-shadow: 0 24px 60px rgba(36, 75, 66, 0.22);
+}
+
+.honestPanel small {
+  color: #e9b872;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.honestPanel h3 {
+  margin: 10px 0 18px;
+  font-size: 1.55rem;
+}
+
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.statusRow:last-child {
+  border-bottom: 0;
+}
+
+.statusRow span:first-child {
+  color: #e2e8f0;
+}
+
+.status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  background: rgba(233, 184, 114, 0.18);
+  color: #ffd79e;
+}
+
+.processGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.processStep {
+  position: relative;
+  padding: 22px;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid #e7ebe9;
+}
+
+.processNumber {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f6e0c4;
+  color: #244b42;
+  font-weight: 900;
+  margin-bottom: 12px;
+}
+
+.processStep h3 {
+  margin: 0 0 7px;
+  color: #244b42;
+}
+
+.processStep p {
+  margin: 0;
+  color: #64748b;
+}
+
+.formLabel {
+  display: block;
+  margin: 14px 0 7px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #244b42;
+}
+
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 14px;
+  color: #64748b;
+  font-size: 0.87rem;
+  line-height: 1.45;
+}
+
+.consent input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  flex: 0 0 auto;
+}
+
+.consent a {
+  color: #244b42;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.successActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.fallback {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fff4cc;
+  color: #7a5700;
+  font-size: 0.9rem;
+}
+
+.contactFacts {
+  display: grid;
+  gap: 12px;
+}
+
+.contactFact {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 18px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e7ebe9;
+}
+
+.contactFact strong {
+  display: block;
+  color: #244b42;
+  margin-bottom: 4px;
+}
+
+.contactFact span,
+.contactFact a {
+  color: #64748b;
+}
+
+.mobileDock {
+  display: none;
+}
+
+.footerMeta {
+  color: #94a3b8;
+  font-size: 0.88rem;
+  margin-top: 7px;
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.footerLinks a {
+  color: #fff;
+  text-decoration: none;
+}
+
+@media (max-width: 980px) {
+  .trustStrip,
+  .processGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .trustStrip,
+  .processGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statusRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mobileDock {
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 60;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 16px 44px rgba(15, 23, 42, 0.2);
+    border: 1px solid rgba(36, 75, 66, 0.12);
+  }
+
+  .mobileDock a {
+    min-height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 13px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .mobileDock a:first-child {
+    background: #244b42;
+    color: #fff;
+  }
+
+  .mobileDock a:last-child {
+    background: #f6e0c4;
+    color: #244b42;
+  }
+}

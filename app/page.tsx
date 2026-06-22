@@ -1,15 +1,11 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ArrowUp,
   Baby,
-  BarChart3,
   Bell,
-  BookOpen,
-  Bot,
   Camera,
-  CheckCircle2,
   ChevronRight,
   ClipboardCheck,
   CreditCard,
@@ -27,60 +23,43 @@ import {
   ShieldCheck,
   Sparkles,
   Stethoscope,
-  UserRound,
   Utensils,
   Video,
-  WalletCards,
   X,
 } from 'lucide-react';
-import {
-  HOME_GALLERY,
-  TOTOSHA_BUILD_DATE,
-  TOTOSHA_CONTACTS,
-  TOTOSHA_DEPLOY_LABEL,
-  TOTOSHA_VERSION,
-} from '../lib/totoshaConfig';
-
-type Page = 'home' | 'about' | 'programs' | 'parents' | 'cabinet' | 'franchise' | 'contacts';
+import { HOME_GALLERY, TOTOSHA_CONTACTS } from '../lib/totoshaConfig';
+import styles from './wave1.module.css';
 
 const nav = [
-  ['about', 'О нас'],
-  ['programs', 'Программы'],
-  ['parents', 'Родителям'],
-  ['cabinet', 'Технологии'],
-  ['franchise', 'Франшиза'],
-  ['contacts', 'Контакты'],
+  ['/about', 'О нас'],
+  ['/programs', 'Программы'],
+  ['/parents', 'Родителям'],
+  ['/cabinet', 'Технологии'],
+  ['/franchise', 'Франшиза'],
+  ['/contacts', 'Контакты'],
 ] as const;
 
-function wa(text: string) {
-  window.open(`${TOTOSHA_CONTACTS.whatsappUrl}?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
+const intentOptions = [
+  'Записаться на экскурсию',
+  'Узнать подходящую группу',
+  'Уточнить формат посещения',
+  'Получить консультацию',
+] as const;
+
+function whatsappUrl(text: string) {
+  return `${TOTOSHA_CONTACTS.whatsappUrl}?text=${encodeURIComponent(text)}`;
 }
 
-function ext(url: string) {
-  window.open(url, '_blank', 'noopener,noreferrer');
-}
-
-function top() {
+function scrollTop() {
   document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
   document.body.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function Btn({
-  children,
-  onClick,
-  kind = 'primary',
-  disabled = false,
-}: {
-  children: React.ReactNode;
-  onClick?: () => void;
-  kind?: 'primary' | 'dark' | 'light';
-  disabled?: boolean;
-}) {
-  return (
-    <button className={`btn btn-${kind}`} onClick={onClick} disabled={disabled}>
-      {children}
-    </button>
-  );
+function track(event: string, payload: Record<string, unknown> = {}) {
+  if (typeof window === 'undefined') return;
+  const analyticsWindow = window as Window & { dataLayer?: Record<string, unknown>[] };
+  analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
+  analyticsWindow.dataLayer.push({ event, ...payload });
 }
 
 function IconBox({ children }: { children: React.ReactNode }) {
@@ -88,507 +67,113 @@ function IconBox({ children }: { children: React.ReactNode }) {
 }
 
 function SectionTitle({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) {
-  return (
-    <div className="section-title">
-      <div className="eyebrow">{eyebrow}</div>
-      <h2>{title}</h2>
-      {text && <p className="lead">{text}</p>}
-    </div>
-  );
+  return <div className="section-title"><div className="eyebrow">{eyebrow}</div><h2>{title}</h2>{text && <p className="lead">{text}</p>}</div>;
 }
 
 function Card({ icon, title, text, tags }: { icon: React.ReactNode; title: string; text: string; tags?: string[] }) {
-  return (
-    <div className="card">
-      <IconBox>{icon}</IconBox>
-      <h3>{title}</h3>
-      <p>{text}</p>
-      {tags && (
-        <div className="feature-list">
-          {tags.map((t) => (
-            <span className="tag" key={t}>
-              {t}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  return <article className="card"><IconBox>{icon}</IconBox><h3>{title}</h3><p>{text}</p>{tags && <div className="feature-list">{tags.map((tag) => <span className="tag" key={tag}>{tag}</span>)}</div>}</article>;
 }
 
-function Header({ page, setPage }: { page: Page; setPage: (p: Page) => void }) {
+function Header() {
   const [open, setOpen] = useState(false);
-  const go = (p: Page) => {
-    setPage(p);
-    setOpen(false);
-    top();
-  };
-
-  return (
-    <header className="header">
-      <div className="container">
-        <div className="nav">
-          <button className="brand" onClick={() => go('home')}>
-            <div className="logo"><Baby size={25} /></div>
-            <div>
-              <div className="brand-title">Тотоша</div>
-              <div className="brand-sub">детский сад нового поколения</div>
-            </div>
-          </button>
-          <div className="links">
-            {nav.map(([id, label]) => (
-              <button key={id} onClick={() => go(id as Page)} style={{ color: page === id ? '#f97316' : undefined }}>
-                {label}
-              </button>
-            ))}
-          </div>
-          <div className="actions">
-            <Btn kind="light" onClick={() => go('cabinet')}>Цифровой кабинет</Btn>
-            <Btn kind="dark" onClick={() => go('contacts')}>Записаться</Btn>
-          </div>
-          <button className="mobile-btn" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button>
-        </div>
-        <div className={`mobile-menu ${open ? 'open' : ''}`}>
-          {(['home', 'about', 'programs', 'parents', 'cabinet', 'franchise', 'contacts'] as Page[]).map((id) => (
-            <button key={id} onClick={() => go(id)}>{id === 'home' ? 'Главная' : nav.find(([x]) => x === id)?.[1]}</button>
-          ))}
-        </div>
-      </div>
-    </header>
-  );
+  return <header className="header"><div className="container"><div className="nav"><a className="brand" href="/" aria-label="На главную Тотоша"><div className="logo"><Baby size={25} /></div><div><div className="brand-title">Тотоша</div><div className="brand-sub">детский сад нового поколения</div></div></a><nav className="links" aria-label="Основная навигация">{nav.map(([href, label]) => <a href={href} key={href}>{label}</a>)}</nav><div className="actions"><a className="btn btn-light" href="/parents">Родителям</a><a className="btn btn-dark" href="/contacts">Записаться</a></div><button className="mobile-btn" type="button" aria-label={open ? 'Закрыть меню' : 'Открыть меню'} onClick={() => setOpen((value) => !value)}>{open ? <X /> : <Menu />}</button></div><div className={`mobile-menu ${open ? 'open' : ''}`}><a href="/">Главная</a>{nav.map(([href, label]) => <a href={href} key={href}>{label}</a>)}</div></div></header>;
 }
 
-function Hero({ setPage }: { setPage: (p: Page) => void }) {
-  return (
-    <section className="hero">
-      <div className="orb1" />
-      <div className="orb2" />
-      <div className="container hero-grid">
-        <div>
-          <div className="badge"><Sparkles size={17} /> Работает на NEXORA AI Platform</div>
-          <h1>Тотоша — место, где забота стала системой</h1>
-          <p className="lead">
-            Безопасность • Развитие • Технологии • Забота. Современный детский сад с видеонаблюдением,
-            Цифровым кабинетом и вниманием к каждому ребёнку.
-          </p>
-          <div className="hero-actions">
-            <Btn onClick={() => wa('Здравствуйте. Хочу записаться на экскурсию в Тотоша.')}>
-              Записаться на экскурсию <ChevronRight size={20} />
-            </Btn>
-            <Btn kind="light" onClick={() => setPage('cabinet')}><LayoutDashboard size={20} /> Открыть Цифровой кабинет</Btn>
-          </div>
-          <div className="stats">
-            {[
-              ['50+', 'детей уже сейчас'],
-              ['130+', 'цель загрузки'],
-              ['550 м²', 'пространства'],
-              ['07:30–19:00', 'время работы'],
-              ['24/7', 'цифровой контроль'],
-            ].map(([a, b]) => (
-              <div className="stat" key={a}><b>{a}</b><span>{b}</span></div>
-            ))}
-          </div>
-        </div>
-        <HeroVisual />
-      </div>
-    </section>
-  );
-}
-
-function HeroVisual() {
-  return (
-    <div className="hero-card hero-card-v035">
-      <div className="hero-scene hero-scene-v035">
-        <div className="bubble b1" />
-        <div className="bubble b2" />
-        <div className="bubble b3" />
-        <div className="emoji e1">🧸</div>
-        <div className="emoji e2">🎨</div>
-        <div className="emoji e3">📚</div>
-        <div className="mini mini-top">
-          <b style={{ display: 'flex', gap: 7, alignItems: 'center' }}><ShieldCheck size={18} color="#16a34a" /> Безопасность</b>
-          <small>видеонаблюдение и отчёты</small>
-        </div>
-        <div className="mini dash">
-          <div className="dash-head">
-            <div><small>Сегодня</small><h3>Группа “Солнышко”</h3></div>
-            <div className="pill">92%</div>
-          </div>
-          {['Завтрак отмечен', 'Развивающее занятие', 'Фотоотчёт отправлен', 'Оплата подтверждена'].map((x) => (
-            <div className="dash-row" key={x}><span>{x}</span><CheckCircle2 size={20} color="#16a34a" /></div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+function Hero() {
+  const facts = [['07:30–19:00', 'режим полного дня'], ['Полдня', 'доступный формат посещения'], ['3 группы', 'по возрасту детей'], ['Астана', 'ул. Алихана Бокейхана, 29А']];
+  return <section className="hero"><div className="orb1" /><div className="orb2" /><div className="container hero-grid"><div><div className="badge"><Sparkles size={17} /> Частный детский сад в Астане</div><h1>Тотоша — место, где забота стала системой</h1><p className="lead">Безопасность, развитие, понятный режим и открытая связь с семьёй. Мы не обещаем лишнего — показываем, как устроен детский сад сегодня и что развивается поэтапно.</p><div className="hero-actions"><a className="btn btn-primary" href={whatsappUrl('Здравствуйте. Хочу записаться на экскурсию в Тотоша.')} onClick={() => track('cta_whatsapp', { location: 'hero', intent: 'excursion' })}>Записаться на экскурсию <ChevronRight size={20} /></a><a className="btn btn-light" href="#family-path">Как проходит знакомство</a></div><div className={styles.trustStrip}>{facts.map(([title, text]) => <div className={styles.trustItem} key={title}><strong>{title}</strong><span>{text}</span></div>)}</div></div><div className={styles.honestPanel}><small>Цифровая экосистема Тотоша</small><h3>Запускается поэтапно после тестирования</h3>{[['Приход и уход ребёнка', 'тестирование'], ['Уведомления родителям', 'подготовлено'], ['Фотоотчёты', 'закрытый доступ'], ['Оплаты и документы', 'следующий этап']].map(([label, status]) => <div className={styles.statusRow} key={label}><span>{label}</span><span className={styles.status}>{status}</span></div>)}</div></div></section>;
 }
 
 function Why() {
   const items = [
-    [<Video />, 'Онлайн видеонаблюдение', 'Прозрачность и спокойствие родителей каждый день.'],
-    [<Stethoscope />, 'Врач-педиатр', 'Внимание к самочувствию и индивидуальным особенностям ребёнка.'],
-    [<MessageCircle />, 'Логопед', 'Развитие речи, коммуникации и уверенности в общении.'],
-    [<Languages />, 'Английский язык', 'Знакомство с языком в игровой и естественной среде.'],
-    [<Mic />, 'Вокал и хореография', 'Творчество, музыка, движение и самовыражение.'],
-    [<Dumbbell />, 'Таэквондо', 'Дисциплина, координация и физическая активность.'],
-    [<LayoutDashboard />, 'Цифровой кабинет', 'Посещаемость, питание, фото, уведомления и оплаты.'],
-    [<Utensils />, 'Сбалансированное питание', 'Продуманный рацион и внимание к особенностям ребёнка.'],
-  ];
-
-  return (
-    <section className="section white">
-      <div className="container">
-        <SectionTitle eyebrow="Преимущества" title="Почему выбирают Тотоша" text="Мы объединяем заботу, развитие, безопасность и современные технологии в одну понятную систему." />
-        <div className="grid grid-4">{items.map(([i, t, d]) => <Card key={String(t)} icon={i} title={String(t)} text={String(d)} />)}</div>
-      </div>
-    </section>
-  );
-}
-
-function Safety() {
-  return (
-    <section className="section">
-      <div className="container">
-        <SectionTitle eyebrow="Безопасность и забота" title="Спокойствие родителей начинается с доверия" />
-        <div className="grid grid-3">
-          <Card icon={<Video />} title="Онлайн видеонаблюдение" text="Родители могут быть спокойны: безопасность и прозрачность находятся в центре нашей работы." />
-          <Card icon={<ShieldCheck />} title="Безопасная среда" text="Продуманное пространство, порядок и ежедневное внимание к важным деталям." />
-          <Card icon={<HeartHandshake />} title="Заботливая атмосфера" text="Ребёнок чувствует поддержку, уважение и внимание каждый день." />
-        </div>
-      </div>
-    </section>
-  );
+    [<Video key="video" />, 'Видеонаблюдение', 'Возможность наблюдать за ребёнком в доступном для родителей формате.', ['Работает']],
+    [<Stethoscope key="doctor" />, 'Врач-педиатр', 'Внимание к самочувствию и индивидуальным особенностям ребёнка.', ['По графику']],
+    [<MessageCircle key="speech" />, 'Логопед', 'Поддержка речи, общения и уверенности ребёнка.', ['Дополнительное направление']],
+    [<Languages key="language" />, 'Английский язык', 'Знакомство с языком через игру и ежедневную коммуникацию.', ['В программе']],
+    [<Mic key="music" />, 'Вокал и хореография', 'Музыка, движение, чувство ритма и самовыражение.', ['В программе']],
+    [<Dumbbell key="sport" />, 'Таэквондо', 'Физическая активность, координация и дисциплина.', ['В программе']],
+    [<Utensils key="food" />, 'Питание', 'Режим питания и фиксация индивидуальных особенностей ребёнка.', ['Уточняется при зачислении']],
+    [<HeartHandshake key="contact" />, 'Связь с семьёй', 'WhatsApp, телефон, экскурсия и личное общение с заведующей.', ['Доступно сейчас']],
+  ] as const;
+  return <section className="section white"><div className="container"><SectionTitle eyebrow="Что получает семья" title="Понятные условия без рекламных преувеличений" text="Перед зачислением родители знакомятся с пространством, режимом, группой и правилами детского сада." /><div className="grid grid-4">{items.map(([icon, title, text, tags]) => <Card key={title} icon={icon} title={title} text={text} tags={[...tags]} />)}</div></div></section>;
 }
 
 function Development() {
-  const arr = [
-    ['Мышление и логика', 'Внимание, память, анализ и самостоятельное мышление.', '🧠'],
-    ['Речь и коммуникация', 'Уверенное общение, взаимодействие и развитие речи.', '🗣'],
-    ['Творческое развитие', 'Воображение, музыка, творчество и самовыражение.', '🎨'],
-    ['Физическая активность', 'Движение, дисциплина, энергия и координация.', '🤸'],
-    ['Эмоциональное развитие', 'Уверенность, самостоятельность и спокойная адаптация.', '❤️'],
-    ['Подготовка к школе', 'Чтение, письмо, математика и интерес к знаниям.', '🎓'],
-  ];
-
-  return (
-    <section className="section white">
-      <div className="container">
-        <SectionTitle eyebrow="Развитие ребёнка" title="Гармоничное развитие через интерес" text="Ребёнок развивается постепенно: через знания, творчество, движение, общение и заботу." />
-        <div className="grid grid-3">{arr.map(([t, d, e]) => <Card key={t} icon={<span style={{ fontSize: 24 }}>{e}</span>} title={t} text={d} />)}</div>
-      </div>
-    </section>
-  );
-}
-
-function Directions() {
-  const items = [
-    ['📚', 'Английский язык', 'Язык через игру и естественную коммуникацию.'],
-    ['🗣', 'Логопед', 'Поддержка развития речи и уверенности.'],
-    ['🎤', 'Вокал', 'Музыка, дыхание и самовыражение.'],
-    ['💃', 'Хореография', 'Движение, пластика и чувство ритма.'],
-    ['🤼', 'Таэквондо', 'Физическая активность и дисциплина.'],
-    ['🧠', 'Развитие мышления', 'Логика, внимание, память и любознательность.'],
-    ['📖', 'Подготовка к школе', 'Навыки для уверенного перехода к обучению.'],
-    ['👨‍⚕️', 'Врач-педиатр', 'Внимание к здоровью и самочувствию.'],
-  ];
-
-  return (
-    <section className="section">
-      <div className="container">
-        <SectionTitle eyebrow="Направления" title="Дополнительные возможности развития" />
-        <div className="grid grid-4">{items.map(([e, t, d]) => <Card key={t} icon={<span style={{ fontSize: 24 }}>{e}</span>} title={t} text={d} />)}</div>
-      </div>
-    </section>
-  );
+  const items = [['🧠', 'Мышление и логика', 'Внимание, память, анализ и самостоятельное мышление.'], ['🗣', 'Речь и коммуникация', 'Уверенное общение, взаимодействие и развитие речи.'], ['🎨', 'Творческое развитие', 'Воображение, музыка, творчество и самовыражение.'], ['🤸', 'Физическая активность', 'Движение, дисциплина, энергия и координация.'], ['❤️', 'Эмоциональное развитие', 'Уверенность, самостоятельность и спокойная адаптация.'], ['🎓', 'Подготовка к школе', 'Чтение, письмо, математика и интерес к знаниям.']];
+  return <section className="section"><div className="container"><SectionTitle eyebrow="Развитие ребёнка" title="Развитие через интерес и устойчивый режим" /><div className="grid grid-3">{items.map(([emoji, title, text]) => <Card key={title} icon={<span style={{ fontSize: 24 }}>{emoji}</span>} title={title} text={text} />)}</div></div></section>;
 }
 
 function Day() {
-  const rows = [
-    ['07:30', 'Приём детей'],
-    ['08:30', 'Завтрак'],
-    ['09:00', 'Развитие и занятия'],
-    ['10:30', 'Прогулка'],
-    ['12:00', 'Обед'],
-    ['13:00', 'Отдых'],
-    ['15:30', 'Полдник'],
-    ['16:00', 'Кружки и дополнительные занятия'],
-    ['17:30', 'Игры и свободная деятельность'],
-    ['19:00', 'Завершение дня'],
-  ];
-
-  return (
-    <section className="section white">
-      <div className="container split">
-        <div>
-          <SectionTitle eyebrow="Режим дня" title="Один день в Тотоша" text="Режим помогает ребёнку чувствовать стабильность, спокойствие и уверенность." />
-          <div className="premium-band"><h3>Формат посещения</h3><p>Полдня и полный день. Детский сад работает с 07:30 до 19:00.</p></div>
-        </div>
-        <div className="timeline">{rows.map(([a, b]) => <div className="time-row" key={a}><div className="time">{a}</div><b>{b}</b></div>)}</div>
-      </div>
-    </section>
-  );
+  const rows = [['07:30', 'Приём детей'], ['08:30', 'Завтрак'], ['09:00', 'Развивающие занятия'], ['10:30', 'Прогулка'], ['12:00', 'Обед'], ['13:00', 'Отдых'], ['15:30', 'Полдник'], ['16:00', 'Дополнительные занятия'], ['17:30', 'Игры и свободная деятельность'], ['19:00', 'Завершение дня']];
+  return <section className="section white"><div className="container split"><div><SectionTitle eyebrow="Режим дня" title="Предсказуемый день помогает ребёнку адаптироваться" text="Фактический режим группы может корректироваться по возрасту и потребностям детей." /><div className="premium-band"><h3>Форматы посещения</h3><p>Полдня и полный день. Подходящий вариант подбирается после знакомства с ребёнком и семьёй.</p></div></div><div className="timeline">{rows.map(([time, label]) => <div className="time-row" key={time}><div className="time">{time}</div><b>{label}</b></div>)}</div></div></section>;
 }
 
-function Parents() {
+function DigitalStatus() {
   const items = [
-    [<LayoutDashboard />, 'Цифровой кабинет', 'Посещаемость, питание, баланс, фотоотчёты и уведомления.'],
-    [<Camera />, 'Фотоотчёты', 'Важные моменты дня ребёнка в удобном формате.'],
-    [<Bell />, 'Уведомления', 'Приход, уход, новости и индивидуальные сообщения.'],
-    [<CreditCard />, 'Удобная оплата', 'Баланс, история оплат и напоминания.'],
-    [<MessageCircle />, 'Быстрая связь', 'Коммуникация с администратором и воспитателем.'],
-    [<ClipboardCheck />, 'Посещаемость', 'Информация о приходе, уходе и отсутствии ребёнка.'],
-  ];
-
-  return (
-    <section className="section">
-      <div className="container">
-        <SectionTitle eyebrow="Родителям" title="Комфорт и прозрачность для семьи" text="Вся важная информация о ребёнке находится под рукой." />
-        <div className="grid grid-3">{items.map(([i, t, d]) => <Card key={String(t)} icon={i} title={String(t)} text={String(d)} />)}</div>
-      </div>
-    </section>
-  );
+    [<ClipboardCheck key="attendance" />, 'Посещаемость', 'События прихода и ухода проходят техническое тестирование.', ['Тестирование']],
+    [<Bell key="notification" />, 'Уведомления', 'Подготовлена логика уведомлений для родителей.', ['Подготовлено']],
+    [<Camera key="photo" />, 'Фотоотчёты', 'Планируется закрытый доступ только для своей семьи.', ['Следующий этап']],
+    [<CreditCard key="payments" />, 'Оплаты', 'Баланс, история и напоминания будут подключаться после пилота.', ['Следующий этап']],
+    [<LayoutDashboard key="team" />, 'Приложение персонала', 'Сотрудники смогут отмечать события со смартфона без отдельного компьютера.', ['Прототип готов']],
+    [<ShieldCheck key="security" />, 'Доступ и безопасность', 'Роли, журнал действий и раздельный доступ заложены в архитектуру.', ['Подготовлено']],
+  ] as const;
+  return <section className="section dark"><div className="container"><SectionTitle eyebrow="Технологии" title="Честный статус цифровых функций" text="Полный кабинет ещё не запущен для всех родителей. Сначала мы тестируем безопасность и реальные сценарии на небольшой группе." /><div className="grid grid-3">{items.map(([icon, title, text, tags]) => <Card key={title} icon={icon} title={title} text={text} tags={[...tags]} />)}</div><div className="hero-actions" style={{ marginTop: 24 }}><a className="btn btn-light" href="/cabinet">Подробнее о развитии экосистемы</a></div></div></section>;
 }
 
-function Cabinet() {
-  const [role, setRole] = useState('parent');
-  const data = useMemo(() => ({
-    parent: [['Ребёнок', 'Айлин, группа Солнышко'], ['Сегодня', 'Пришла в 08:42'], ['Питание', 'Завтрак и обед отмечены'], ['Баланс', '0 ₸']],
-    admin: [['Заявки', '12 новых за неделю'], ['Группы', 'Солнышко: 24 / 26'], ['Оплаты', '3 напоминания сегодня'], ['Договоры', 'готовы к проверке']],
-    owner: [['Загрузка', '50 детей сейчас'], ['Цель', '130+ детей'], ['Финансы', 'прогноз выручки'], ['KPI', 'контроль процессов']],
-  }[role] || []), [role]);
-
-  const cards = [
-    [<UserRound />, 'Карточка ребёнка', 'Контакты, группа, особенности, договор и история посещений.'],
-    [<WalletCards />, 'Финансы', 'Начисления, оплаты, баланс, скидки и отчёты.'],
-    [<BarChart3 />, 'Аналитика', 'Загрузка групп, заявки, KPI и контроль качества.'],
-    [<Bot />, 'AI-помощник', 'Сообщения, напоминания, отчёты и контроль задач.'],
-    [<Camera />, 'Фотоотчёты', 'Безопасная публикация моментов для родителей.'],
-    [<Bell />, 'Уведомления', 'Важные сообщения и события без человеческого фактора.'],
-  ];
-
-  return (
-    <section className="section dark">
-      <div className="container">
-        <SectionTitle eyebrow="Цифровой кабинет" title="Тотоша управляется как система" text="Понятный кабинет для родителей, администратора и руководителя." />
-        <div className="tabs">
-          <button className={`tab ${role === 'parent' ? 'active' : ''}`} onClick={() => setRole('parent')}>Родитель</button>
-          <button className={`tab ${role === 'admin' ? 'active' : ''}`} onClick={() => setRole('admin')}>Администратор</button>
-          <button className={`tab ${role === 'owner' ? 'active' : ''}`} onClick={() => setRole('owner')}>Руководитель</button>
-        </div>
-        <div className="panel">
-          <div className="panel-inner">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-              <div><small style={{ color: '#94a3b8' }}>Панель</small><h3>{role === 'parent' ? 'Кабинет родителя' : role === 'admin' ? 'Панель администратора' : 'Панель руководителя'}</h3></div>
-              <LayoutDashboard color="#fb923c" />
-            </div>
-            <div className="demo-grid">{data.map(([a, b]) => <div className="demo-item" key={a}><span>{a}</span><b>{b}</b></div>)}</div>
-          </div>
-        </div>
-        <div className="grid grid-3" style={{ marginTop: 22 }}>{cards.map(([i, t, d]) => <Card key={String(t)} icon={i} title={String(t)} text={String(d)} />)}</div>
-      </div>
-    </section>
-  );
+function FamilyPath() {
+  const steps = [['1', 'Заявка', 'Вы оставляете телефон и выбираете тему обращения.'], ['2', 'Связь', 'Заведующая уточняет возраст ребёнка и отвечает на вопросы.'], ['3', 'Экскурсия', 'Вы знакомитесь с пространством, режимом и правилами.'], ['4', 'Решение', 'После знакомства выбирается группа и формат посещения.']];
+  return <section id="family-path" className="section"><div className="container"><SectionTitle eyebrow="После заявки" title="Понятный путь семьи без давления" text="Заявка не обязывает к зачислению. Сначала знакомство, ответы на вопросы и только потом решение." /><div className={styles.processGrid}>{steps.map(([number, title, text]) => <article className={styles.processStep} key={number}><div className={styles.processNumber}>{number}</div><h3>{title}</h3><p>{text}</p></article>)}</div></div></section>;
 }
 
-function LeadForm({ title = 'Записаться на экскурсию', intent = 'Записаться на экскурсию' }: { title?: string; intent?: string }) {
+function LeadForm() {
   const [name, setName] = useState('');
   const [digits, setDigits] = useState('');
+  const [intent, setIntent] = useState<(typeof intentOptions)[number]>('Записаться на экскурсию');
   const [comment, setComment] = useState('');
-  const [sent, setSent] = useState(false);
+  const [consent, setConsent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
-
-  function handle(v: string) {
-    setDigits(v.replace(/\D/g, '').slice(0, 10));
-  }
-
-  function fmt(d: string) {
-    return [d.slice(0, 3), d.slice(3, 6), d.slice(6, 8), d.slice(8, 10)].filter(Boolean).join(' ');
-  }
+  const phone = `+7 ${[digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 8), digits.slice(8, 10)].filter(Boolean).join(' ')}`;
+  const message = `Здравствуйте. Меня зовут ${name.trim() || 'родитель'}. ${intent}. Телефон: ${phone}${comment.trim() ? `. Комментарий: ${comment.trim()}` : ''}`;
 
   async function submit() {
-    setError('');
-    if (!name.trim()) {
-      setError('Введите имя.');
-      return;
-    }
-    if (digits.length < 10) {
-      setError('Введите 10 цифр телефона после +7.');
-      return;
-    }
-
-    const phone = '+7 ' + fmt(digits);
-    const payload = { name: name.trim(), phone, intent, comment: comment.trim(), source: 'totoshakids.kz', date: new Date().toISOString() };
-    setSending(true);
-
+    setError(''); setSent(false);
+    if (!name.trim()) return setError('Введите имя.');
+    if (digits.length !== 10) return setError('Введите ровно 10 цифр телефона после +7.');
+    if (!consent) return setError('Подтвердите согласие на обработку данных для обратной связи.');
+    const payload = { name: name.trim(), phone, intent, comment: comment.trim(), source: 'totoshakids.kz', path: window.location.pathname, date: new Date().toISOString() };
+    setSending(true); track('lead_submit_started', { intent, path: payload.path });
     try {
-      const old = JSON.parse(localStorage.getItem('totosha_leads') || '[]');
-      localStorage.setItem('totosha_leads', JSON.stringify([payload, ...old]));
+      const response = await fetch('/api/leads', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!response.ok) throw new Error(`Lead API returned ${response.status}`);
+      try {
+        const old = JSON.parse(localStorage.getItem('totosha_leads') || '[]');
+        localStorage.setItem('totosha_leads', JSON.stringify([payload, ...old].slice(0, 20)));
+      } catch {}
+      setSent(true); track('lead_submit_success', { intent, path: payload.path });
     } catch {
-      // localStorage может быть недоступен в приватном режиме, заявка всё равно отправится в API/WhatsApp.
-    }
-
-    try {
-      await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-    } catch {
-      // WhatsApp остаётся резервным каналом заявки.
-    }
-
-    setSending(false);
-    setSent(true);
-    wa(`Здравствуйте. Меня зовут ${payload.name}. ${intent}. Телефон: ${phone}${payload.comment ? '. Комментарий: ' + payload.comment : ''}`);
+      setError('Не удалось отправить автоматически. Напишите нам в WhatsApp или позвоните — сообщение уже подготовлено.');
+      track('lead_submit_fallback', { intent, path: payload.path });
+    } finally { setSending(false); }
   }
 
-  return (
-    <div className="form">
-      <h3>{title}</h3>
-      <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ваше имя" />
-      <div className="phone-wrap"><span className="phone-prefix">+7</span><input type="tel" inputMode="numeric" maxLength={10} value={digits} onChange={(e) => handle(e.target.value)} placeholder="7071230108" /></div>
-      <div className="phone-help">Введите ровно 10 цифр после +7. Например: 7071230108</div>
-      <select value={intent} onChange={() => {}}><option>{intent}</option></select>
-      <textarea value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Комментарий" rows={4} />
-      <button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 14 }} onClick={submit} disabled={sending}>
-        <Send size={18} /> {sending ? 'Отправляем...' : 'Отправить заявку'}
-      </button>
-      {error && <div className="form-error">{error}</div>}
-      {sent && <div className="success"><b>Заявка принята</b><p>Открыт WhatsApp с готовым сообщением для администратора.</p></div>}
-    </div>
-  );
+  return <div className="form"><h3>Записаться на знакомство</h3><label className={styles.formLabel} htmlFor="lead-name">Ваше имя</label><input id="lead-name" value={name} onChange={(event) => setName(event.target.value)} placeholder="Как к вам обращаться" /><label className={styles.formLabel} htmlFor="lead-phone">Телефон</label><div className="phone-wrap"><span className="phone-prefix">+7</span><input id="lead-phone" type="tel" inputMode="numeric" maxLength={10} value={digits} onChange={(event) => setDigits(event.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="7071230108" /></div><div className="phone-help">Введите 10 цифр после +7.</div><label className={styles.formLabel} htmlFor="lead-intent">Что вас интересует</label><select id="lead-intent" value={intent} onChange={(event) => setIntent(event.target.value as (typeof intentOptions)[number])}>{intentOptions.map((option) => <option key={option}>{option}</option>)}</select><label className={styles.formLabel} htmlFor="lead-comment">Комментарий</label><textarea id="lead-comment" value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Возраст ребёнка или удобное время для звонка" rows={4} /><label className={styles.consent}><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>Согласен на обработку контактных данных для ответа на обращение. <a href="/privacy">Подробнее</a>.</span></label><button className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', marginTop: 14 }} type="button" onClick={submit} disabled={sending}><Send size={18} /> {sending ? 'Отправляем...' : 'Отправить заявку'}</button>{error && <div className={styles.fallback}>{error}<div className={styles.successActions}><a className="btn btn-light" href={whatsappUrl(message)}>Написать в WhatsApp</a><a className="btn btn-light" href={TOTOSHA_CONTACTS.telUrl}>Позвонить</a></div></div>}{sent && <div className="success"><b>Заявка отправлена</b><p>Заведующая свяжется с вами для уточнения возраста ребёнка и удобного времени экскурсии.</p><div className={styles.successActions}><a className="btn btn-light" href={whatsappUrl(message)}>Дополнить в WhatsApp</a><a className="btn btn-light" href={TOTOSHA_CONTACTS.telUrl}>Позвонить сейчас</a></div></div>}</div>;
 }
 
-function ProgramsPage() {
-  return (
-    <>
-      <Directions />
-      <Development />
-      <Day />
-      <section className="section"><div className="container split"><LeadForm title="Узнать программу для ребёнка" intent="Хочу узнать программу для ребёнка" /><Card icon={<BookOpen />} title="Русский и Казахский" text="Сайт подготовлен под развитие двуязычной коммуникации с родителями и будущую версию на Казахском языке." /></div></section>
-    </>
-  );
+function ContactsSection() {
+  const facts = [[<MapPin key="map" />, 'Адрес', 'Астана, ул. Алихана Бокейхана, 29А', TOTOSHA_CONTACTS.mapUrl], [<Phone key="phone" />, 'Телефон', TOTOSHA_CONTACTS.phoneDisplay, TOTOSHA_CONTACTS.telUrl], [<MessageCircle key="wa" />, 'WhatsApp', 'Быстрая связь с детским садом', whatsappUrl('Здравствуйте. Хочу узнать подробнее про Тотоша.')], [<ImageIcon key="instagram" />, 'Instagram', '@totoshakids', TOTOSHA_CONTACTS.instagramUrl]] as const;
+  return <section className="section white"><div className="container split"><div><SectionTitle eyebrow="Контакты" title="Свяжитесь удобным способом" text={`Основной контакт — ${TOTOSHA_CONTACTS.contactPerson}, ${TOTOSHA_CONTACTS.contactRole.toLowerCase()}.`} /><div className={styles.contactFacts}>{facts.map(([icon, title, text, href]) => <div className={styles.contactFact} key={title}><IconBox>{icon}</IconBox><div><strong>{title}</strong><a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>{text}</a></div></div>)}</div></div><LeadForm /></div></section>;
 }
 
-function AboutPage() {
-  return (
-    <>
-      <section className="section"><div className="container"><SectionTitle eyebrow="О нас" title="Тотоша — современная образовательная среда" text="Здесь забота, развитие, безопасность и технологии соединены в одну систему." /><div className="grid grid-2"><Card icon={<HeartHandshake />} title="Наша идея" text="Создать детский сад, которому родители доверяют через прозрачные процессы и уважительное отношение к ребёнку." /><Card icon={<ShieldCheck />} title="Наш стандарт" text="Безопасность, чистота, режим, развитие, открытость и управленческая дисциплина внутри команды." /></div></div></section>
-      <Safety />
-      <section className="section white"><div className="container"><SectionTitle eyebrow="Принципы" title="Стандарты Тотоша" /><div className="grid grid-3">{[['🧼', 'Чистота и порядок', 'Комфортная и организованная среда каждый день.'], ['❤️', 'Заботливое отношение', 'Внимание, поддержка и уважение к каждому ребёнку.'], ['🤝', 'Партнёрство с родителями', 'Открытость, прозрачность и совместное участие в развитии ребёнка.']].map(([e, t, d]) => <Card key={t} icon={<span style={{ fontSize: 24 }}>{e}</span>} title={t} text={d} />)}</div></div></section>
-    </>
-  );
+function LifeTeaser() {
+  return <section id="life" className="home-life home-life-v035"><div className="home-life__text"><div className="eyebrow">Жизнь Тотоша</div><h2>Настоящие моменты детского сада</h2><p>Праздники, занятия и атмосфера заботы собраны в фотоархиве. Публично размещаются только выбранные материалы.</p><a className="btn btn-primary" href="/life">Открыть фотоархив</a></div><div className="home-life__photos">{HOME_GALLERY.map((item) => <span className="home-life__photo" key={item.src}><img src={item.src} alt={item.alt} draggable={false} /><span className="home-life__caption">{item.title}</span></span>)}</div></section>;
 }
 
-function ParentsPage() {
-  return (
-    <>
-      <Parents />
-      <section className="section white"><div className="container split"><div><SectionTitle eyebrow="FAQ" title="Частые вопросы" /><div className="faq grid">{[['Как проходит адаптация?', 'Постепенно и спокойно, с вниманием к характеру ребёнка и обратной связью для родителей.'], ['Есть ли группы на полдня?', 'Да, доступны форматы на полдня и полный день.'], ['Как учитываются аллергии?', 'Индивидуальные особенности ребёнка фиксируются и учитываются в питании и уходе.'], ['Есть ли дополнительные занятия?', 'Да: Английский язык, логопед, вокал, хореография, таэквондо и подготовка к школе.'], ['Как работает Цифровой кабинет?', 'Родитель видит посещаемость, питание, фотоотчёты, уведомления и оплату.'], ['Как записаться?', 'Оставьте заявку или напишите в WhatsApp — администратор подберёт удобное время экскурсии.']].map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div></div><LeadForm title="Записаться на экскурсию" intent="Хочу записаться на экскурсию в Тотоша" /></div></section>
-    </>
-  );
+function Footer() {
+  return <footer className="footer"><div className="container footer-row"><div><div className="brand-title">Тотоша</div><div className="brand-sub">Частный детский сад в Астане</div><div className={styles.footerMeta}>Алихана Бокейхана, 29А · Пн–Пт, 07:30–19:00</div></div><div className={styles.footerLinks}><a href="/contacts">Контакты</a><a href="/parents">Родителям</a><a href="/privacy">Обработка данных</a><a href={TOTOSHA_CONTACTS.instagramUrl} target="_blank" rel="noopener noreferrer">Instagram</a></div></div></footer>;
 }
 
-function Franchise() {
-  return (
-    <section className="section"><div className="container"><SectionTitle eyebrow="Франшиза" title="Откройте Тотоша в своём городе" text="Франшиза строится на системе: стандарты, Цифровой кабинет, обучение, продажи, финансы и контроль качества." /><div className="split"><div className="premium-band"><h3>Что получает партнёр</h3>{['Бренд и стандарты Тотоша', 'Методология запуска', 'Цифровой кабинет и AI-помощник', 'Скрипты продаж и маркетинг', 'Финансовая модель', 'Обучение команды'].map((x) => <p key={x}>✓ {x}</p>)}</div><LeadForm title="Получить презентацию франшизы" intent="Интересует франшиза Тотоша" /></div></div></section>
-  );
-}
-
-function Contacts() {
-  const contacts = [
-    [<MessageCircle />, 'WhatsApp', 'Написать администратору', () => wa('Здравствуйте. Хочу узнать подробнее про Тотоша.')],
-    [<Phone />, 'Позвонить', `Позвонить на ${TOTOSHA_CONTACTS.phoneDisplay}`, () => ext(TOTOSHA_CONTACTS.telUrl)],
-    [<ImageIcon />, 'Instagram @totoshakids', 'Открыть официальный профиль', () => ext(TOTOSHA_CONTACTS.instagramUrl)],
-    [<Send />, 'Telegram', 'Открыть Telegram', () => ext(TOTOSHA_CONTACTS.telegramUrl)],
-    [<MapPin />, 'Карта 2ГИС', 'Открыть маршрут к Тотоша', () => ext(TOTOSHA_CONTACTS.mapUrl)],
-  ];
-
-  return (
-    <section className="section"><div className="container"><SectionTitle eyebrow="Контакты" title="Связаться с Тотоша" text="Выберите удобный способ связи или оставьте заявку." /><div className="split"><div className="grid">{contacts.map(([i, t, d, fn]: any) => <button className="contact-card" key={t} onClick={fn}><IconBox>{i}</IconBox><div><h3>{t}</h3><p>{d}</p></div></button>)}</div><LeadForm title="Оставить заявку" intent="Хочу связаться с Тотоша" /></div></div></section>
-  );
-}
-
-function HomeLifeTeaser() {
-  return (
-    <section id="life" className="home-life home-life-v035">
-      <div className="home-life__text">
-        <div className="eyebrow">Жизнь Тотоша</div>
-        <h2>Настоящие моменты детского сада</h2>
-        <p>Праздники, занятия, улыбки, развитие и ежедневная атмосфера заботы — всё собрано в защищённом фотоархиве Тотоша.</p>
-        <a className="btn btn-primary" href="/life">Открыть фотоархив</a>
-      </div>
-      <div className="home-life__photos">
-        {HOME_GALLERY.map((item) => (
-          <span className="home-life__photo" key={item.src}>
-            <img src={item.src} alt={item.alt} draggable={false} />
-            <span className="home-life__caption">{item.title}</span>
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function SEOBlock() {
-  return (
-    <section className="section"><div className="container"><SectionTitle eyebrow="Для поиска" title="Детский сад Тотоша в Астане" /><p className="seo-text">Тотоша — частный детский сад в Астане с современным подходом к развитию детей. В детском саду предусмотрены онлайн видеонаблюдение, врач-педиатр, логопед, Английский язык, вокал, хореография, таэквондо, подготовка к школе, фотоотчёты, Цифровой кабинет, группы на полдня и полный день. Время работы: 07:30–19:00.</p></div></section>
-  );
-}
-
-function Home({ setPage }: { setPage: (p: Page) => void }) {
-  return (
-    <>
-      <Hero setPage={setPage} />
-      <Why />
-      <Safety />
-      <Directions />
-      <Day />
-      <Development />
-      <Parents />
-      <Cabinet />
-      <HomeLifeTeaser />
-      <SEOBlock />
-      <section className="section white"><div className="container split"><div><SectionTitle eyebrow="Первое знакомство" title="Путь семьи в Тотоша" text="Заявка → экскурсия → знакомство с пространством → адаптация → комфортное посещение → развитие ребёнка." /><Btn onClick={() => wa('Здравствуйте. Хочу записаться на экскурсию в Тотоша.')}>Записаться в WhatsApp</Btn></div><LeadForm title="Записаться на экскурсию" intent="Хочу записаться на экскурсию в Тотоша" /></div></section>
-    </>
-  );
-}
-
-function Footer({ setPage }: { setPage: (p: Page) => void }) {
-  return (
-    <footer className="footer"><div className="container footer-row"><div><div className="brand-title">Тотоша</div><div className="brand-sub">Детский сад нового поколения. Powered by NEXORA.</div></div><div className="hero-actions" style={{ marginTop: 0 }}><Btn kind="light" onClick={() => wa('Здравствуйте. Хочу узнать подробнее про Тотоша.')}>WhatsApp</Btn><Btn kind="light" onClick={() => ext(TOTOSHA_CONTACTS.instagramUrl)}>Instagram</Btn><Btn kind="light" onClick={() => setPage('cabinet')}>Цифровой кабинет</Btn></div></div></footer>
-  );
-}
-
-export default function App() {
-  const [page, setPage] = useState<Page>('home');
-  const current = {
-    home: <Home setPage={setPage} />,
-    about: <AboutPage />,
-    programs: <ProgramsPage />,
-    parents: <ParentsPage />,
-    cabinet: <Cabinet />,
-    franchise: <Franchise />,
-    contacts: <Contacts />,
-  }[page];
-
-  return (
-    <div className="page">
-      <Header page={page} setPage={setPage} />
-      <main>
-        <div className="version-badge" title="NEXORA automated release marker">
-          <strong>TOTOSHA {TOTOSHA_VERSION}</strong>
-          <span>Build {TOTOSHA_BUILD_DATE}</span>
-          <em>{TOTOSHA_DEPLOY_LABEL}</em>
-        </div>
-        {current}
-      </main>
-      <Footer setPage={setPage} />
-      <div className="floating">
-        <button className="float-btn float-whatsapp" onClick={() => wa('Здравствуйте. Хочу узнать подробнее про Тотоша.')}><MessageCircle /></button>
-        <button className="float-btn float-top" onClick={top}><ArrowUp /></button>
-      </div>
-    </div>
-  );
+export default function HomePage() {
+  return <div className="page"><Header /><main><Hero /><Why /><Development /><Day /><DigitalStatus /><FamilyPath /><LifeTeaser /><ContactsSection /></main><Footer /><div className="floating"><button className="float-btn float-top" aria-label="Наверх" onClick={scrollTop}><ArrowUp /></button></div><div className={styles.mobileDock} aria-label="Быстрая связь"><a href={whatsappUrl('Здравствуйте. Хочу узнать подробнее про Тотоша.')}><MessageCircle size={18} /> WhatsApp</a><a href={TOTOSHA_CONTACTS.telUrl}><Phone size={18} /> Позвонить</a></div></div>;
 }
