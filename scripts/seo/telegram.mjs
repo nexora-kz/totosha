@@ -93,7 +93,7 @@ function isMondayInAstana() {
 
 function buildMessage(technical, gsc) {
   const favicon = technical?.endpoints?.find(
-    (endpoint) => endpoint.path === "/favicon.ico",
+    (endpoint) => endpoint.path === "/icon.svg",
   );
 
   const lines = [
@@ -115,9 +115,13 @@ function buildMessage(technical, gsc) {
 
   if (gsc?.configured) {
     const inspections = gsc.inspections ?? [];
-    const inspectionErrors = inspections.filter((row) => row.error).length;
-    const indexed = inspections.filter(isIndexed).length;
+    const successfulInspections = inspections.filter((row) => !row.error);
+    const inspectionErrors = inspections.length - successfulInspections.length;
+    const indexed = successfulInspections.filter(isIndexed).length;
     const sitemap = sitemapState(gsc);
+    const indexingStatus = successfulInspections.length
+      ? `${indexed}/${successfulInspections.length}`
+      : "проверка недоступна";
 
     lines.push(
       "",
@@ -130,7 +134,7 @@ function buildMessage(technical, gsc) {
       )})`,
       `CTR: ${percent(gsc.totals?.ctr ?? 0)}`,
       `Средняя позиция: ${position(gsc.totals?.position)}`,
-      `Индексация Google: ${indexed}/${inspections.length || PAGES.length}${
+      `Индексация Google: ${indexingStatus}${
         inspectionErrors ? `, ошибок проверки: ${inspectionErrors}` : ""
       }`,
       `Sitemap: ${escapeHtml(sitemap.label)}`,
@@ -220,8 +224,13 @@ function buildMessage(technical, gsc) {
     if (sitemap.severity === "critical") {
       alerts.push(`Sitemap: ${sitemap.label}.`);
     }
-    if (inspections.length && indexed < inspections.length) {
-      alerts.push(`Индексация продолжается: ${indexed}/${inspections.length} страниц.`);
+    if (
+      successfulInspections.length &&
+      indexed < successfulInspections.length
+    ) {
+      alerts.push(
+        `Индексация продолжается: ${indexed}/${successfulInspections.length} страниц.`,
+      );
     }
     if (
       previousImpressions >= 50 &&
@@ -230,6 +239,7 @@ function buildMessage(technical, gsc) {
       alerts.push("Показы снизились более чем на 30% относительно прошлого периода.");
     }
     if (
+      previousImpressions > 0 &&
       impressions >= 50 &&
       Number(gsc.comparison?.positionDelta) >= 3
     ) {
