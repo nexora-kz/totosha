@@ -56,7 +56,7 @@ async function accessToken(account) {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({
-      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      grant_type: "urn:ietf:params:oauth-type:jwt-bearer",
       assertion,
     }),
   });
@@ -155,106 +155,138 @@ async function inspectUrl(token, url) {
   });
 }
 
+async function writeUnavailableReport(output, reason, details = null) {
+  const report = {
+    configured: false,
+    generatedAt: new Date().toISOString(),
+    reason,
+    details,
+  };
+  await writeFile(output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+  console.log(reason);
+}
+
 async function main() {
   const output = process.argv[2] || "gsc-report.json";
+  const federatedToken = process.env.GOOGLE_OAUTH_ACCESS_TOKEN?.trim();
   const account = serviceAccount();
-  if (!account) {
-    const report = {
-      configured: false,
-      generatedAt: new Date().toISOString(),
-      reason:
-        "GOOGLE_SERVICE_ACCOUNT_JSON не задан. Технический мониторинг продолжает работать.",
-    };
-    await writeFile(output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
-    console.log(report.reason);
+
+  if (!federatedToken && !account) {
+    await writeUnavailableReport(
+      output,
+      process.env.GOOGLE_AUTH_OUTCOME === "failure"
+        ? "Google OIDC-аутентификация не выполнена. Проверьте Workload Identity Federation и доступ service account к Search Console."
+        : "Google Search Console API не подключён. Технический мониторинг продолжает работать.",
+      { authOutcome: process.env.GOOGLE_AUTH_OUTCOME ?? null },
+    );
     return;
   }
 
-  const token = await accessToken(account);
+  const authMode = federatedToken
+    ? "workload_identity_federation"
+    : "service_account_json";
+  const token = federatedToken || (await accessToken(account));
   const endDate = daysAgo(3);
   const startDate = daysAgo(30);
   const previousEndDate = daysAgo(31);
   const previousStartDate = daysAgo(58);
 
-  const [currentRaw, previousRaw, queriesRaw, pagesRaw, sitemaps] =
-    await Promise.all([
-      searchAnalytics(token, startDate, endDate),
-      searchAnalytics(token, previousStartDate, previousEndDate),
-      searchAnalytics(token, startDate, endDate, ["query"]),
-      searchAnalytics(token, startDate, endDate, ["page"]),
-      sitemapStatus(token),
-    ]);
+  try {
+    const [currentRaw, previousRaw, queriesRaw, pagesRaw, sitemaps] =
+      await Promise.all([
+        searchAnalytics(token, startDate, endDate),
+        searchAnalytics(token, previousStartDate, previousEndDate),
+        searchAnalytics(token, startDate, endDate, ["query"]),
+        searchAnalytics(token, startDate, endDate, ["page"]),
+        sitemapStatus(token),
+      ]);
 
-  const current = totals(currentRaw.rows?.[0]);
-  const previous = totals(previousRaw.rows?.[0]);
+    const current = totals(currentRaw.rows?.[0]);
+    const previous = totals(previousRaw.rows?.[0]);
 
-  const inspections = [];
-  for (const page of PAGES) {
-    const url = new URL(page.path, SEARCH_CONSOLE_SITE_URL).toString();
-    try {
-      const result = await inspectUrl(token, url);
-      const indexStatus = result.inspectionResult?.indexStatusResult ?? {};
-      inspections.push({
-        url,
-        verdict: indexStatus.verdict ?? null,
-        coverageState: indexStatus.coverageState ?? null,
-        robotsTxtState: indexStatus.robotsTxtState ?? null,
-        indexingState: indexStatus.indexingState ?? null,
-        lastCrawlTime: indexStatus.lastCrawlTime ?? null,
-        pageFetchState: indexStatus.pageFetchState ?? null,
-        googleCanonical: indexStatus.googleCanonical ?? null,
-        userCanonical: indexStatus.userCanonical ?? null,
-      });
-    } catch (error) {
-      inspections.push({
-        url,
-        error: error instanceof Error ? error.message : "unknown",
-      });
+    const inspections = [];
+    for (const page of PAGES) {
+      const url = new URL(page.path, SEARCH_CONSOLE_SITE_URL).toString();
+      try {
+        const result = await inspectUrl(token, url);
+        const indexStatus = result.inspectionResult?.indexStatusResult ?? {};
+        inspections.push({
+          url,
+          verdict: indexStatus.verdict ?? null,
+          coverageState: indexStatus.coverageState ?? null,
+          robotsTxtState: indexStatus.robotsTxtState ?? null,
+          indexingState: indexStatus.indexingState ?? null,
+          lastCrawlTime: indexStatus.lastCrawlTime ?? null,
+          pageFetchState: indexStatus.pageFetchState ?? null,
+          googleCanonical: indexStatus.googleCanonical ?? null,
+          userCanonical: indexStatus.userCanonical ?? null,
+        });
+      } catch (error) {
+        inspections.push({
+          url,
+          error: error instanceof Error ? error.message : "unknown",
+        });
+      }
     }
-  }
 
-  const report = {
-    configured: true,
-    generatedAt: new Date().toISOString(),
-    property: SEARCH_CONSOLE_SITE_URL,
-    period: { startDate, endDate },
-    previousPeriod: { startDate: previousStartDate, endDate: previousEndDate },
-    totals: current,
-    previousTotals: previous,
-    comparison: compare(current, previous),
-    topQueries: (queriesRaw.rows ?? []).slice(0, 25).map((row) => ({
-      query: row.keys?.[0] ?? "",
-      clicks: row.clicks,
-      impressions: row.impressions,
-      ctr: row.ctr,
-      position: row.position,
-    })),
-    topPages: (pagesRaw.rows ?? []).slice(0, 25).map((row) => ({
-      page: row.keys?.[0] ?? "",
-      clicks: row.clicks,
-      impressions: row.impressions,
-      ctr: row.ctr,
-      position: row.position,
-    })),
-    sitemaps: sitemaps.sitemap ?? [],
-    inspections,
-  };
-
-  await writeFile(output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
-  console.log(
-    JSON.stringify(
-      {
-        period: report.period,
-        totals: report.totals,
-        inspectedPages: inspections.length,
+    const report = {
+      configured: true,
+      authMode,
+      generatedAt: new Date().toISOString(),
+      property: SEARCH_CONSOLE_SITE_URL,
+      period: { startDate, endDate },
+      previousPeriod: {
+        startDate: previousStartDate,
+        endDate: previousEndDate,
       },
-      null,
-      2,
-    ),
-  );
+      totals: current,
+      previousTotals: previous,
+      comparison: compare(current, previous),
+      topQueries: (queriesRaw.rows ?? []).slice(0, 25).map((row) => ({
+        query: row.keys?.[0] ?? "",
+        clicks: row.clicks,
+        impressions: row.impressions,
+        ctr: row.ctr,
+        position: row.position,
+      })),
+      topPages: (pagesRaw.rows ?? []).slice(0, 25).map((row) => ({
+        page: row.keys?.[0] ?? "",
+        clicks: row.clicks,
+        impressions: row.impressions,
+        ctr: row.ctr,
+        position: row.position,
+      })),
+      sitemaps: sitemaps.sitemap ?? [],
+      inspections,
+    };
+
+    await writeFile(output, `${JSON.stringify(report, null, 2)}\n`, "utf8");
+    console.log(
+      JSON.stringify(
+        {
+          authMode,
+          period: report.period,
+          totals: report.totals,
+          inspectedPages: inspections.length,
+        },
+        null,
+        2,
+      ),
+    );
+  } catch (error) {
+    await writeUnavailableReport(
+      output,
+      "Google Search Console API ответил ошибкой. Проверьте, что service account добавлен в нужное свойство Search Console.",
+      {
+        authMode,
+        error: error instanceof Error ? error.message : "unknown",
+      },
+    );
+    process.exitCode = 1;
+  }
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
   process.exitCode = 1;
 });
