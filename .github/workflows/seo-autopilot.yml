@@ -1,0 +1,82 @@
+name: TOTOSHA SEO Autopilot
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "public/**"
+      - "components/**"
+      - "data/**"
+      - "scripts/seo/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: totosha-seo-autopilot
+  cancel-in-progress: false
+
+jobs:
+  seo:
+    name: Monitor, report and notify search engines
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Technical SEO monitor
+        id: monitor
+        continue-on-error: true
+        run: |
+          node scripts/seo/monitor.mjs \
+            --json seo-report.json \
+            --markdown seo-report.md
+
+      - name: Google Search Console report
+        continue-on-error: true
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: node scripts/seo/gsc.mjs gsc-report.json
+
+      - name: Notify IndexNow after site changes
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        continue-on-error: true
+        run: node scripts/seo/indexnow.mjs
+
+      - name: Send Telegram report
+        if: always()
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/seo/telegram.mjs seo-report.json gsc-report.json
+
+      - name: Upload SEO report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: totosha-seo-report-${{ github.run_number }}
+          path: |
+            seo-report.json
+            seo-report.md
+            gsc-report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Fail on critical technical errors
+        if: steps.monitor.outcome == 'failure'
+        run: |
+          echo "Critical SEO monitoring errors were detected."
+          exit 1

@@ -1,0 +1,7 @@
+node_modules/
+.next/
+.env
+.env.local
+seo-report.json
+seo-report.md
+gsc-report.json
