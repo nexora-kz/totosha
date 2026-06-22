@@ -17,6 +17,7 @@ export const PAGES = [
 export const REQUIRED_ENDPOINTS = [
   "/robots.txt",
   "/sitemap-totosha.xml",
+  "/favicon.ico",
   "/icon.svg",
 ];
 
