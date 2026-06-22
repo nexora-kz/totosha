@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Тотоша</title>
+  <desc id="desc">Иконка детского сада Тотоша</desc>
+  <rect width="512" height="512" rx="112" fill="#f7f2e8"/>
+  <rect x="72" y="72" width="368" height="368" rx="96" fill="#244b42"/>
+  <circle cx="190" cy="180" r="48" fill="#e9b872"/>
+  <circle cx="322" cy="180" r="48" fill="#d98769"/>
+  <rect x="142" y="250" width="228" height="112" rx="44" fill="#ffffff"/>
+  <path d="M214 278h84v24h-28v60h-28v-60h-28z" fill="#244b42"/>
+</svg>
