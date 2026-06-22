@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     default: 'Тотоша — детский сад нового поколения в Астане',
     template: '%s | Тотоша',
   },
-  description: 'Тотоша — современный детский сад в Астане: видеонаблюдение, логопед, Английский язык, хореография, вокал, таэквондо, врач-педиатр и Цифровой кабинет.',
+  description: 'Тотоша — современный частный детский сад в Астане: видеонаблюдение, логопед, английский язык, дополнительные занятия и поэтапно развиваемая цифровая экосистема.',
   keywords: ['детский сад Астана','Тотоша','частный детский сад','детский сад с видеонаблюдением','логопед Астана','подготовка к школе','детский сад левый берег','садик Астана'],
   alternates: {
     canonical: '/',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Тотоша — место, где забота стала системой',
-    description: 'Современный детский сад в Астане: безопасность, развитие, технологии и забота.',
+    description: 'Частный детский сад в Астане: безопасность, развитие, понятный режим и открытая связь с семьёй.',
     url: 'https://www.totoshakids.kz',
     siteName: 'Тотоша',
     type: 'website',
@@ -68,11 +68,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               alternateName: 'Totosha Kids',
               url: 'https://www.totoshakids.kz',
               logo: 'https://www.totoshakids.kz/icon.svg',
-              description: 'Современный детский сад нового поколения в Астане с видеонаблюдением, цифровым кабинетом, логопедом, английским языком и дополнительными занятиями.',
+              description: 'Современный частный детский сад в Астане с видеонаблюдением, логопедом, английским языком, дополнительными занятиями и цифровыми сервисами, которые запускаются поэтапно.',
               telephone: '+7 776 700 29 29',
               areaServed: 'Астана, Казахстан',
               address: {
                 '@type': 'PostalAddress',
+                streetAddress: 'ул. Алихана Бокейхана, 29А',
                 addressLocality: 'Астана',
                 addressCountry: 'KZ',
               },
@@ -144,70 +145,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
         <script
-          id="totosha-lead-flow-v035"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                var blockAutoWhatsAppUntil = 0;
-                var lastWhatsAppUrl = '';
-                var nativeOpen = window.open;
-
-                window.open = function(url, target, features) {
-                  var href = String(url || '');
-                  var isWhatsApp = href.indexOf('https://wa.me/') === 0 || href.indexOf('http://wa.me/') === 0;
-                  if (isWhatsApp && Date.now() < blockAutoWhatsAppUntil) {
-                    lastWhatsAppUrl = href;
-                    setTimeout(enhanceSuccessMessage, 80);
-                    setTimeout(enhanceSuccessMessage, 300);
-                    setTimeout(enhanceSuccessMessage, 900);
-                    return null;
-                  }
-                  return nativeOpen.call(window, url, target, features);
-                };
-
-                document.addEventListener('click', function(event) {
-                  var target = event.target;
-                  var button = target && target.closest ? target.closest('.form .btn-primary') : null;
-                  if (!button) return;
-                  var form = button.closest('.form');
-                  if (!form) return;
-                  blockAutoWhatsAppUntil = Date.now() + 5000;
-                }, true);
-
-                function enhanceSuccessMessage() {
-                  var cards = document.querySelectorAll('.form .success');
-                  cards.forEach(function(card) {
-                    if (card.dataset.v035Enhanced === '1') return;
-                    card.dataset.v035Enhanced = '1';
-                    var title = card.querySelector('b');
-                    var text = card.querySelector('p');
-                    if (title) title.textContent = 'Заявка принята';
-                    if (text) text.textContent = 'Спасибо. Айшагуль Галымжановна свяжется с вами в ближайшее время.';
-
-                    var actions = document.createElement('div');
-                    actions.className = 'lead-success-actions';
-
-                    var note = document.createElement('span');
-                    note.textContent = 'Хотите быстрее? Можно написать напрямую:';
-                    actions.appendChild(note);
-
-                    var link = document.createElement('button');
-                    link.type = 'button';
-                    link.className = 'btn btn-light lead-whatsapp-button';
-                    link.textContent = 'Написать в WhatsApp';
-                    link.addEventListener('click', function() {
-                      var url = lastWhatsAppUrl || 'https://wa.me/77767002929?text=' + encodeURIComponent('Здравствуйте. Хочу узнать подробнее про Тотоша.');
-                      nativeOpen.call(window, url, '_blank', 'noopener,noreferrer');
-                    });
-                    actions.appendChild(link);
-                    card.appendChild(actions);
-                  });
-                }
-              })();
-            `,
-          }}
-        />
-        <script
           id="totosha-life-top-button"
           dangerouslySetInnerHTML={{
             __html: `
@@ -239,6 +176,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-
       </body></html>;
 }
