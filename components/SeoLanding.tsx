@@ -18,6 +18,7 @@ type SeoLandingProps = {
   details?: Detail[];
   faq?: Faq[];
   cta?: string;
+  whatsappIntent?: string;
 };
 
 const nav = [
@@ -38,7 +39,10 @@ export function SeoLanding({
   details = [],
   faq = [],
   cta = 'Записаться на экскурсию',
+  whatsappIntent = 'Здравствуйте. Хочу записаться на экскурсию в Тотоша.',
 }: SeoLandingProps) {
+  const whatsappHref = `${TOTOSHA_CONTACTS.whatsappUrl}?text=${encodeURIComponent(whatsappIntent)}`;
+
   return (
     <main className="seo-landing seo-page-unified">
       <header className="header seo-unified-header">
@@ -51,13 +55,13 @@ export function SeoLanding({
                 <div className="brand-sub">детский сад нового поколения</div>
               </div>
             </a>
-            <div className="links">
+            <nav className="links" aria-label="Основная навигация">
               {nav.slice(1).map(([href, label]) => (
                 <a key={href} href={href}>{label}</a>
               ))}
-            </div>
+            </nav>
             <div className="actions">
-              <a className="btn btn-light" href="/cabinet">Цифровой кабинет</a>
+              <a className="btn btn-light" href="/parents">Родителям</a>
               <a className="btn btn-dark" href="/contacts">Записаться</a>
             </div>
           </div>
@@ -73,7 +77,7 @@ export function SeoLanding({
             <h1>{title}</h1>
             <p className="lead">{description}</p>
             <div className="hero-actions">
-              <a className="btn btn-primary" href={`${TOTOSHA_CONTACTS.whatsappUrl}?text=${encodeURIComponent('Здравствуйте. Хочу записаться на экскурсию в Тотоша.')}`}>{cta}</a>
+              <a className="btn btn-primary" href={whatsappHref}>{cta}</a>
               <a className="btn btn-light" href={TOTOSHA_CONTACTS.telUrl}>Позвонить: {TOTOSHA_CONTACTS.phoneDisplay}</a>
             </div>
           </div>
@@ -87,14 +91,14 @@ export function SeoLanding({
               <div className="emoji e3">📚</div>
               <div className="mini mini-top">
                 <b>Тотоша</b>
-                <small>безопасность, развитие и забота</small>
+                <small>Астана · 07:30–19:00</small>
               </div>
               <div className="mini dash">
                 <div className="dash-head">
-                  <div><small>Сегодня</small><h3>День ребёнка под контролем</h3></div>
+                  <div><small>Первое знакомство</small><h3>Сначала экскурсия и ответы на вопросы</h3></div>
                   <div className="pill">✓</div>
                 </div>
-                {['Забота и адаптация', 'Развитие по возрасту', 'Связь с родителями', 'Цифровой контроль'].map((item) => (
+                {['Заявка без обязательств', 'Связь с заведующей', 'Знакомство с группой', 'Решение после экскурсии'].map((item) => (
                   <div className="dash-row" key={item}><span>{item}</span><b>OK</b></div>
                 ))}
               </div>
@@ -107,14 +111,14 @@ export function SeoLanding({
         <div className="container">
           <div className="section-title">
             <div className="eyebrow">Что важно знать</div>
-            <h2>Почему родители выбирают Тотоша</h2>
+            <h2>Понятно о детском саде</h2>
           </div>
           <div className="grid grid-3">
             {bullets.map((item) => (
               <article className="card" key={item}>
                 <div className="icon">✓</div>
                 <h3>{item}</h3>
-                <p>Мы соединяем заботу, безопасность, развитие и современные технологии в понятную систему для семьи.</p>
+                <p>Подробности можно уточнить у заведующей до экскурсии или во время личного знакомства с детским садом.</p>
               </article>
             ))}
           </div>
@@ -126,7 +130,7 @@ export function SeoLanding({
           <div className="container">
             <div className="section-title">
               <div className="eyebrow">Подробнее</div>
-              <h2>Сильные стороны Тотоша</h2>
+              <h2>Как это устроено</h2>
             </div>
             <div className="seo-detail-list">
               {details.map((item) => (
@@ -158,6 +162,40 @@ export function SeoLanding({
           </div>
         </section>
       )}
+
+      <section className="section seo-landing__content">
+        <div className="container split">
+          <div>
+            <div className="eyebrow">Следующий шаг</div>
+            <h2>Познакомьтесь с Тотоша лично</h2>
+            <p className="lead">Заявка не обязывает к зачислению. Заведующая уточнит возраст ребёнка и предложит удобное время экскурсии.</p>
+            <div className="hero-actions">
+              <a className="btn btn-primary" href={whatsappHref}>{cta}</a>
+              <a className="btn btn-light" href={TOTOSHA_CONTACTS.mapUrl} target="_blank" rel="noopener noreferrer">Открыть маршрут</a>
+            </div>
+          </div>
+          <div className="premium-band">
+            <h3>Контакты</h3>
+            <p><strong>{TOTOSHA_CONTACTS.contactPerson}</strong><br />{TOTOSHA_CONTACTS.contactRole}</p>
+            <p><a href={TOTOSHA_CONTACTS.telUrl}>{TOTOSHA_CONTACTS.phoneDisplay}</a></p>
+            <p>Астана, ул. Алихана Бокейхана, 29А</p>
+            <p>Пн–Пт, 07:30–19:00</p>
+          </div>
+        </div>
+      </section>
+
+      <footer className="footer">
+        <div className="container footer-row">
+          <div>
+            <div className="brand-title">Тотоша</div>
+            <div className="brand-sub">Частный детский сад в Астане</div>
+          </div>
+          <div className="hero-actions" style={{ marginTop: 0 }}>
+            <a className="btn btn-light" href="/contacts">Контакты</a>
+            <a className="btn btn-light" href="/privacy">Обработка данных</a>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
