@@ -20,6 +20,7 @@ export function PremiumHeader() {
 
   return (
     <header className="premium-header">
+      <style>{`.premium-site{overflow:visible;overflow-x:clip}`}</style>
       <div className="premium-shell">
         <div className="premium-nav">
           <a className="premium-brand" href="/" aria-label="Тотоша — главная">
