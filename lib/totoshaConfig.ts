@@ -2,6 +2,8 @@ export const TOTOSHA_VERSION = 'v037';
 export const TOTOSHA_BUILD_DATE = '2026-06-21';
 export const TOTOSHA_DEPLOY_LABEL = 'Stable Web v037 ✓';
 
+const mapQuery = encodeURIComponent('Тотоша, Астана, улица Алихана Бокейхана, 29А');
+
 export const TOTOSHA_CONTACTS = {
   phoneDigits: '77767002929',
   phoneDisplay: '+7 (776) 700-29-29',
@@ -13,6 +15,8 @@ export const TOTOSHA_CONTACTS = {
   telegramUrl: 'https://t.me/totoshakids',
   mapUrl:
     'https://2gis.kz/astana/search/%D0%A2%D0%BE%D1%82%D0%BE%D1%88%D0%B0%20%D0%90%D0%BB%D0%B8%D1%85%D0%B0%D0%BD%20%D0%91%D0%BE%D0%BA%D0%B5%D0%B9%D1%85%D0%B0%D0%BD%2029%D0%B0',
+  yandexMapUrl: `https://yandex.kz/maps/?text=${mapQuery}`,
+  yandexMapEmbedUrl: `https://yandex.ru/map-widget/v1/?mode=search&text=${mapQuery}&z=17`,
 } as const;
 
 export const HOME_GALLERY = [

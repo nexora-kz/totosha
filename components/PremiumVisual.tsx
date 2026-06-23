@@ -190,9 +190,24 @@ function ContactsVisual() {
   const whatsapp = `${TOTOSHA_CONTACTS.whatsappUrl}?text=${encodeURIComponent('Здравствуйте. Хочу записаться на экскурсию в Тотоша.')}`;
   return (
     <div className="premium-visual premium-visual-contacts">
-      <div className="premium-map-card">
-        <div className="premium-map-grid" />
-        <div className="premium-map-pin"><MapPin size={27} /></div>
+      <style>{`
+        .premium-map-card.premium-map-live::after { display: none; }
+        .premium-map-card.premium-map-live { background: #ebe5d8; }
+        .premium-map-live iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .premium-map-live .premium-map-label { z-index: 4; pointer-events: none; }
+        .premium-map-live .premium-map-open { position: absolute; z-index: 4; right: 18px; top: 18px; display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 13px; border-radius: 14px; color: #0d1b3a; background: rgba(255,253,248,.94); box-shadow: 0 12px 28px rgba(13,27,58,.12); text-decoration: none; font-size: 10px; font-weight: 800; backdrop-filter: blur(10px); }
+      `}</style>
+      <div className="premium-map-card premium-map-live">
+        <iframe
+          src={TOTOSHA_CONTACTS.yandexMapEmbedUrl}
+          title="Тотоша на карте Астаны"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+        />
+        <a className="premium-map-open" href={TOTOSHA_CONTACTS.yandexMapUrl} target="_blank" rel="noopener noreferrer">
+          Открыть карту <ArrowUpRight size={14} />
+        </a>
         <div className="premium-map-label"><strong>Тотоша</strong><small>Алихана Бокейхана, 29А</small></div>
       </div>
       <div className="premium-contact-concierge">
@@ -201,6 +216,7 @@ function ContactsVisual() {
         <a href={TOTOSHA_CONTACTS.telUrl}><Phone size={19} /><span><small>Позвонить</small><strong>{TOTOSHA_CONTACTS.phoneDisplay}</strong></span><ArrowUpRight size={16} /></a>
         <a href={whatsapp} target="_blank" rel="noopener noreferrer"><MessageCircle size={19} /><span><small>WhatsApp</small><strong>Написать заведующей</strong></span><ArrowUpRight size={16} /></a>
         <a href={TOTOSHA_CONTACTS.mapUrl} target="_blank" rel="noopener noreferrer"><MapPin size={19} /><span><small>2ГИС</small><strong>Построить маршрут</strong></span><ArrowUpRight size={16} /></a>
+        <a href={TOTOSHA_CONTACTS.yandexMapUrl} target="_blank" rel="noopener noreferrer"><MapPin size={19} /><span><small>Яндекс Карты</small><strong>Открыть навигацию</strong></span><ArrowUpRight size={16} /></a>
         <div className="premium-contact-hours"><Clock3 size={17} /> Пн–Пт · 07:30–19:00</div>
       </div>
     </div>
