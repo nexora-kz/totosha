@@ -1,6 +1,6 @@
-export const TOTOSHA_VERSION = 'v081';
+export const TOTOSHA_VERSION = 'v082';
 export const TOTOSHA_BUILD_DATE = '2026-06-23';
-export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v081';
+export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v082';
 
 const mapQuery = encodeURIComponent('Тотоша, Астана, улица Алихана Бокейхана, 29А');
 
@@ -20,19 +20,38 @@ export const TOTOSHA_CONTACTS = {
   yandexMapEmbedUrl: `https://yandex.ru/map-widget/v1/?mode=search&text=${mapQuery}&z=17`,
 } as const;
 
+export const PREMIUM_VISUALS = {
+  home: {
+    src: '/totosha-premium/home-hero.jpg',
+    alt: 'Счастливые дети на празднике в детском саду Тотоша',
+  },
+  about: {
+    src: '/totosha-premium/home-hero.jpg',
+    alt: 'Тёплая атмосфера и забота в детском саду Тотоша',
+  },
+  programs: {
+    src: '/totosha-premium/programs-hero.jpg',
+    alt: 'Дети участвуют в развивающих занятиях Тотоша',
+  },
+  parents: {
+    src: '/totosha-premium/parents-hero.jpg',
+    alt: 'Радостные дети в спокойной атмосфере детского сада Тотоша',
+  },
+} as const;
+
 export const HOME_GALLERY = [
   {
-    src: '/totosha-media/2022/Новый_год_2022/001_photo_10@26-12-2022_14-37-49.jpg',
+    src: '/totosha-premium/home-hero.jpg',
     alt: 'Новый год в Тотоша',
     title: 'Праздники',
   },
   {
-    src: '/totosha-media/2022/Новый_год_2022/002_photo_17@26-12-2022_14-37-49.jpg',
+    src: '/totosha-premium/programs-hero.jpg',
     alt: 'Праздник в детском саду Тотоша',
     title: 'Мероприятия',
   },
   {
-    src: '/totosha-media/2022/Новый_год_2022/003_photo_23@26-12-2022_14-37-49.jpg',
+    src: '/totosha-premium/parents-hero.jpg',
     alt: 'Жизнь детского сада Тотоша',
     title: 'Атмосфера',
   },
