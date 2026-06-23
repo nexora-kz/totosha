@@ -2,7 +2,8 @@
 .premium-visual-about .premium-photo-frame,
 .premium-visual-programs .premium-photo-frame,
 .premium-visual-parents .premium-photo-frame {
-  background-image: url('/generated/hero');
+  background-color: #efe4cf;
+  background-image: url('/generated/hero?v=079');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -25,4 +26,17 @@
 
 .premium-visual-parents .premium-photo-frame {
   background-position: center 32%;
+}
+
+/* The old photo badges were being covered by the foreground cards and looked like hidden text. */
+.premium-visual-about .premium-photo-badge,
+.premium-visual-programs .premium-photo-badge,
+.premium-visual-parents .premium-photo-badge {
+  display: none;
+}
+
+.premium-team-card,
+.premium-week-card,
+.premium-parent-path {
+  z-index: 5;
 }
