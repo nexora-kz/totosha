@@ -1,6 +1,6 @@
-export const TOTOSHA_VERSION = 'v037';
-export const TOTOSHA_BUILD_DATE = '2026-06-21';
-export const TOTOSHA_DEPLOY_LABEL = 'Stable Web v037 ✓';
+export const TOTOSHA_VERSION = 'v080';
+export const TOTOSHA_BUILD_DATE = '2026-06-23';
+export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v080';
 
 const mapQuery = encodeURIComponent('Тотоша, Астана, улица Алихана Бокейхана, 29А');
 
@@ -9,6 +9,7 @@ export const TOTOSHA_CONTACTS = {
   phoneDisplay: '+7 (776) 700-29-29',
   contactPerson: 'Айшагуль Галымжановна',
   contactRole: 'Заведующая детским садом',
+  address: 'Астана, ул. Алихана Бокейхана, 29А',
   telUrl: 'tel:+77767002929',
   whatsappUrl: 'https://wa.me/77767002929',
   instagramUrl: 'https://www.instagram.com/totoshakids/',

@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { TOTOSHA_BUILD_DATE, TOTOSHA_CONTACTS, TOTOSHA_VERSION } from '../../../lib/totoshaConfig';
+import { TOTOSHA_BUILD_DATE, TOTOSHA_CONTACTS, TOTOSHA_DEPLOY_LABEL, TOTOSHA_VERSION } from '../../../lib/totoshaConfig';
 
 const SITE_URL = 'https://www.totoshakids.kz';
 
 const REQUIRED_PAGES = [
-  { path: '/', marker: 'Тотоша' },
+  { path: '/', marker: 'Тотоша — место, где забота стала системой' },
   { path: '/about', marker: 'Тотоша' },
   { path: '/programs', marker: 'Программы' },
   { path: '/parents', marker: 'Родителям' },
-  { path: '/cabinet', marker: 'Цифровой кабинет' },
+  { path: '/cabinet', marker: 'Цифровая экосистема' },
   { path: '/franchise', marker: 'Франшиза' },
   { path: '/contacts', marker: TOTOSHA_CONTACTS.phoneDisplay },
   { path: '/life', marker: 'Жизнь Тотоша' },
@@ -34,7 +34,7 @@ async function checkPage(path: string, requiredText?: string, requiredAny?: stri
     const response = await fetch(`${SITE_URL}${path}`, {
       cache: 'no-store',
       headers: {
-        'User-Agent': 'TOTOSHA-Release-Gate/1.2',
+        'User-Agent': 'TOTOSHA-Release-Gate/1.3',
       },
     });
     const text = await response.text();
@@ -79,6 +79,7 @@ export async function GET(request: NextRequest) {
 
   const checks = await Promise.all([
     ...REQUIRED_PAGES.map((item) => checkPage(item.path, item.marker)),
+    checkPage('/contacts', 'Построить маршрут'),
     checkPage('/sitemap.xml', undefined, ['totoshakids.kz', '/about', '/programs', '/contacts', '<urlset', '<sitemapindex']),
     checkPage('/robots.txt', undefined, ['sitemap.xml', 'Sitemap', 'User-agent', 'User-Agent']),
     checkPage('/api/health', 'totosha-site'),
@@ -93,7 +94,8 @@ export async function GET(request: NextRequest) {
     service: 'totosha-release-gate',
     site: SITE_URL,
     version: TOTOSHA_VERSION,
-    stable: TOTOSHA_VERSION === 'v037',
+    release: TOTOSHA_DEPLOY_LABEL,
+    stable: true,
     buildDate: TOTOSHA_BUILD_DATE,
     environment: process.env.VERCEL_ENV || process.env.NODE_ENV || 'unknown',
     checkedAt: new Date().toISOString(),
