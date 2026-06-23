@@ -23,7 +23,7 @@ permissions:
 
 concurrency:
   group: totosha-seo-autopilot
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   seo:
