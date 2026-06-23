@@ -1,6 +1,10 @@
-export const TOTOSHA_VERSION = 'v082';
+import homeHero from '../public/totosha-premium/home-hero.jpg';
+import programsHero from '../public/totosha-premium/programs-hero.jpg';
+import parentsHero from '../public/totosha-premium/parents-hero.jpg';
+
+export const TOTOSHA_VERSION = 'v083';
 export const TOTOSHA_BUILD_DATE = '2026-06-23';
-export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v082';
+export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v083';
 
 const mapQuery = encodeURIComponent('Тотоша, Астана, улица Алихана Бокейхана, 29А');
 
@@ -22,36 +26,36 @@ export const TOTOSHA_CONTACTS = {
 
 export const PREMIUM_VISUALS = {
   home: {
-    src: '/totosha-premium/home-hero.jpg',
+    src: homeHero.src,
     alt: 'Счастливые дети на празднике в детском саду Тотоша',
   },
   about: {
-    src: '/totosha-premium/home-hero.jpg',
+    src: homeHero.src,
     alt: 'Тёплая атмосфера и забота в детском саду Тотоша',
   },
   programs: {
-    src: '/totosha-premium/programs-hero.jpg',
+    src: programsHero.src,
     alt: 'Дети участвуют в развивающих занятиях Тотоша',
   },
   parents: {
-    src: '/totosha-premium/parents-hero.jpg',
+    src: parentsHero.src,
     alt: 'Радостные дети в спокойной атмосфере детского сада Тотоша',
   },
 } as const;
 
 export const HOME_GALLERY = [
   {
-    src: '/totosha-premium/home-hero.jpg',
+    src: PREMIUM_VISUALS.home.src,
     alt: 'Новый год в Тотоша',
     title: 'Праздники',
   },
   {
-    src: '/totosha-premium/programs-hero.jpg',
+    src: PREMIUM_VISUALS.programs.src,
     alt: 'Праздник в детском саду Тотоша',
     title: 'Мероприятия',
   },
   {
-    src: '/totosha-premium/parents-hero.jpg',
+    src: PREMIUM_VISUALS.parents.src,
     alt: 'Жизнь детского сада Тотоша',
     title: 'Атмосфера',
   },
