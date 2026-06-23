@@ -79,13 +79,13 @@ jobs:
         continue-on-error: true
         run: node scripts/seo/indexnow.mjs
 
-      - name: Send Telegram report
+      - name: Send Telegram report with deployed site version
         if: always()
         continue-on-error: true
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: node scripts/seo/telegram.mjs seo-report.json gsc-report.json
+        run: node --import ./scripts/seo/version-fetch-hook.mjs scripts/seo/telegram.mjs seo-report.json gsc-report.json
 
       - name: Upload SEO report
         if: always()
