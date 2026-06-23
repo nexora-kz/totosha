@@ -20,20 +20,20 @@ import {
   Star,
   Users,
 } from 'lucide-react';
-import { HOME_GALLERY, TOTOSHA_CONTACTS } from '../lib/totoshaConfig';
+import { PREMIUM_VISUALS, TOTOSHA_CONTACTS } from '../lib/totoshaConfig';
 
 export type PremiumPageVariant = 'about' | 'programs' | 'parents' | 'technology' | 'franchise' | 'contacts';
 
 const visualImage = {
-  about: HOME_GALLERY[0]?.src,
-  programs: HOME_GALLERY[1]?.src,
-  parents: HOME_GALLERY[2]?.src,
+  about: PREMIUM_VISUALS.about,
+  programs: PREMIUM_VISUALS.programs,
+  parents: PREMIUM_VISUALS.parents,
 } as const;
 
-function PhotoFrame({ src, alt, badge }: { src?: string; alt: string; badge: string }) {
+function PhotoFrame({ src, alt, badge }: { src: string; alt: string; badge: string }) {
   return (
     <div className="premium-photo-frame">
-      {src ? <img src={src} alt={alt} draggable={false} /> : <div className="premium-photo-fallback"><Flower2 size={58} /></div>}
+      <img src={src} alt={alt} draggable={false} loading="eager" decoding="async" />
       <span className="premium-photo-glow" />
       <div className="premium-photo-badge">
         <Sparkles size={16} />
@@ -46,7 +46,7 @@ function PhotoFrame({ src, alt, badge }: { src?: string; alt: string; badge: str
 function AboutVisual() {
   return (
     <div className="premium-visual premium-visual-about">
-      <PhotoFrame src={visualImage.about} alt="Атмосфера детского сада Тотоша" badge="Забота в каждой детали" />
+      <PhotoFrame src={visualImage.about.src} alt={visualImage.about.alt} badge="Забота в каждой детали" />
       <div className="premium-floating-note premium-floating-note-top">
         <span className="premium-note-icon"><Heart size={19} /></span>
         <div><small>Главный принцип</small><strong>Сначала доверие</strong></div>
@@ -87,7 +87,7 @@ function ProgramsVisual() {
             </div>
           ))}
         </div>
-        <PhotoFrame src={visualImage.programs} alt="Занятия и атмосфера в Тотоша" badge="Развитие через интерес" />
+        <PhotoFrame src={visualImage.programs.src} alt={visualImage.programs.alt} badge="Развитие через интерес" />
       </div>
       <div className="premium-week-card">
         <span className="premium-card-kicker premium-card-kicker-light">Ритм недели</span>
@@ -113,7 +113,7 @@ function ParentsVisual() {
   ];
   return (
     <div className="premium-visual premium-visual-parents">
-      <PhotoFrame src={visualImage.parents} alt="Жизнь детского сада Тотоша" badge="Спокойное знакомство" />
+      <PhotoFrame src={visualImage.parents.src} alt={visualImage.parents.alt} badge="Спокойное знакомство" />
       <div className="premium-parent-path">
         <span className="premium-card-kicker">Путь семьи</span>
         <h3>Понятно на каждом этапе</h3>
@@ -192,12 +192,21 @@ function ContactsVisual() {
     <div className="premium-visual premium-visual-contacts">
       <style>{`
         .premium-map-card.premium-map-live::after { display: none; }
-        .premium-map-card.premium-map-live { background: #ebe5d8; }
-        .premium-map-live iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-        .premium-map-live .premium-map-label { z-index: 4; pointer-events: none; }
-        .premium-map-live .premium-map-open { position: absolute; z-index: 4; right: 18px; top: 18px; display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 13px; border-radius: 14px; color: #0d1b3a; background: rgba(255,253,248,.94); box-shadow: 0 12px 28px rgba(13,27,58,.12); text-decoration: none; font-size: 10px; font-weight: 800; backdrop-filter: blur(10px); }
+        .premium-map-card.premium-map-live { background: #ebe5d8; padding-top: 86px; }
+        .premium-map-live iframe { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: calc(100% - 86px); border: 0; }
+        .premium-map-summary { position: absolute; z-index: 5; left: 0; right: 0; top: 0; min-height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; border-bottom: 1px solid rgba(200,155,74,.18); background: #fffdf8; }
+        .premium-map-summary strong { display: block; color: #0d1b3a; font-family: var(--font-premium-serif), Georgia, serif; font-size: 22px; }
+        .premium-map-summary small { display: block; margin-top: 4px; color: #5f6879; font-size: 9px; }
+        .premium-map-open { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 0 13px; border: 1px solid rgba(200,155,74,.24); border-radius: 14px; color: #0d1b3a; background: #fff; text-decoration: none; font-size: 10px; font-weight: 800; white-space: nowrap; }
+        @media (max-width: 720px) { .premium-map-summary { align-items: flex-start; flex-direction: column; min-height: 124px; } .premium-map-card.premium-map-live { padding-top: 124px; } .premium-map-live iframe { height: calc(100% - 124px); } .premium-map-open { width: 100%; justify-content: center; } }
       `}</style>
       <div className="premium-map-card premium-map-live">
+        <div className="premium-map-summary">
+          <div><strong>Тотоша на карте</strong><small>{TOTOSHA_CONTACTS.address}</small></div>
+          <a className="premium-map-open" href={TOTOSHA_CONTACTS.yandexMapUrl} target="_blank" rel="noopener noreferrer">
+            Открыть карту <ArrowUpRight size={14} />
+          </a>
+        </div>
         <iframe
           src={TOTOSHA_CONTACTS.yandexMapEmbedUrl}
           title="Тотоша на карте Астаны"
@@ -205,10 +214,6 @@ function ContactsVisual() {
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen
         />
-        <a className="premium-map-open" href={TOTOSHA_CONTACTS.yandexMapUrl} target="_blank" rel="noopener noreferrer">
-          Открыть карту <ArrowUpRight size={14} />
-        </a>
-        <div className="premium-map-label"><strong>Тотоша</strong><small>Алихана Бокейхана, 29А</small></div>
       </div>
       <div className="premium-contact-concierge">
         <span className="premium-card-kicker">Мы на связи</span>
