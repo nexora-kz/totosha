@@ -1,6 +1,6 @@
-export const TOTOSHA_VERSION = 'v080';
+export const TOTOSHA_VERSION = 'v081';
 export const TOTOSHA_BUILD_DATE = '2026-06-23';
-export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v080';
+export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v081';
 
 const mapQuery = encodeURIComponent('Тотоша, Астана, улица Алихана Бокейхана, 29А');
 
