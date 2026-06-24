@@ -1,13 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import {
   ArrowUpRight,
   Baby,
   BookOpen,
   CalendarDays,
   Camera,
-  Check,
   Clock3,
   CreditCard,
   HeartHandshake,
@@ -16,7 +14,6 @@ import {
   MessageCircle,
   Music2,
   Phone,
-  Send,
   ShieldCheck,
   Sparkles,
   Sprout,
@@ -26,6 +23,7 @@ import {
 } from 'lucide-react';
 import { PremiumFooter } from '../components/PremiumFooter';
 import { PremiumHeader } from '../components/PremiumHeader';
+import { PremiumLeadForm } from '../components/PremiumLeadForm';
 import { PremiumMap } from '../components/PremiumMap';
 import { HOME_GALLERY, TOTOSHA_CONTACTS } from '../lib/totoshaConfig';
 
@@ -55,13 +53,6 @@ const features = [
   { icon: Camera, title: 'Видеонаблюдение', text: 'Доступ в установленном формате' },
 ];
 
-const intentOptions = [
-  'Записаться на экскурсию',
-  'Узнать подходящую группу',
-  'Уточнить формат посещения',
-  'Получить консультацию',
-] as const;
-
 function whatsappUrl(text: string) {
   return `${TOTOSHA_CONTACTS.whatsappUrl}?text=${encodeURIComponent(text)}`;
 }
@@ -71,126 +62,6 @@ function track(event: string, payload: Record<string, unknown> = {}) {
   const analyticsWindow = window as Window & { dataLayer?: Record<string, unknown>[] };
   analyticsWindow.dataLayer = analyticsWindow.dataLayer || [];
   analyticsWindow.dataLayer.push({ event, ...payload });
-}
-
-function PremiumLeadForm() {
-  const [name, setName] = useState('');
-  const [digits, setDigits] = useState('');
-  const [intent, setIntent] = useState<(typeof intentOptions)[number]>('Записаться на экскурсию');
-  const [comment, setComment] = useState('');
-  const [website, setWebsite] = useState('');
-  const [consent, setConsent] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  const phone = `+7 ${[digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 8), digits.slice(8, 10)].filter(Boolean).join(' ')}`;
-  const fallbackText = `Здравствуйте. Меня зовут ${name.trim() || 'родитель'}. ${intent}. Телефон: ${phone}${comment.trim() ? `. Комментарий: ${comment.trim()}` : ''}`;
-
-  async function submit() {
-    setMessage(null);
-    if (name.trim().length < 2) return setMessage({ type: 'error', text: 'Введите имя.' });
-    if (digits.length !== 10) return setMessage({ type: 'error', text: 'Введите 10 цифр телефона после +7.' });
-    if (!consent) return setMessage({ type: 'error', text: 'Подтвердите согласие на обработку контактных данных.' });
-
-    const payload = {
-      name: name.trim(),
-      phone,
-      intent,
-      comment: comment.trim(),
-      website,
-      source: 'totoshakids.kz premium',
-      path: window.location.pathname,
-    };
-
-    setSending(true);
-    track('premium_lead_started', { intent });
-
-    try {
-      const response = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const result = await response.json().catch(() => null) as null | {
-        ok?: boolean;
-        accepted?: boolean;
-        stored?: boolean;
-        telegram?: { sent?: boolean };
-      };
-      const delivered = Boolean(result?.ok && (result.accepted || result.stored || result.telegram?.sent));
-      if (!response.ok || !delivered) throw new Error('delivery failed');
-
-      setMessage({ type: 'success', text: 'Заявка доставлена. Заведующая свяжется с вами, чтобы согласовать удобное время.' });
-      setName('');
-      setDigits('');
-      setComment('');
-      setConsent(false);
-      track('premium_lead_success', { intent });
-    } catch {
-      setMessage({ type: 'error', text: 'Автоматическая отправка временно недоступна. Используйте WhatsApp или звонок ниже.' });
-      track('premium_lead_fallback', { intent });
-    } finally {
-      setSending(false);
-    }
-  }
-
-  return (
-    <div className="premium-lead-form">
-      <h3>Записаться на экскурсию</h3>
-      <p>Оставьте контакт — мы уточним возраст ребёнка и предложим удобное время.</p>
-
-      <div className="premium-field">
-        <label htmlFor="premium-name">Ваше имя</label>
-        <input id="premium-name" maxLength={80} value={name} onChange={(event) => setName(event.target.value)} placeholder="Как к вам обращаться" autoComplete="name" />
-      </div>
-
-      <div className="premium-field">
-        <label htmlFor="premium-phone">Телефон</label>
-        <div className="premium-phone-field">
-          <span>+7</span>
-          <input id="premium-phone" type="tel" inputMode="numeric" maxLength={10} value={digits} onChange={(event) => setDigits(event.target.value.replace(/\D/g, '').slice(0, 10))} placeholder="707 123 01 08" autoComplete="tel" />
-        </div>
-      </div>
-
-      <div className="premium-field">
-        <label htmlFor="premium-intent">Что вас интересует</label>
-        <select id="premium-intent" value={intent} onChange={(event) => setIntent(event.target.value as (typeof intentOptions)[number])}>
-          {intentOptions.map((option) => <option key={option}>{option}</option>)}
-        </select>
-      </div>
-
-      <div className="premium-field">
-        <label htmlFor="premium-comment">Комментарий</label>
-        <textarea id="premium-comment" rows={3} maxLength={1000} value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Возраст ребёнка или удобное время для звонка" />
-      </div>
-
-      <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}>
-        <label htmlFor="premium-website">Сайт</label>
-        <input id="premium-website" tabIndex={-1} autoComplete="off" value={website} onChange={(event) => setWebsite(event.target.value)} />
-      </div>
-
-      <label className="premium-consent">
-        <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
-        <span>Согласен на обработку контактных данных для ответа на обращение. <a href="/privacy">Подробнее</a>.</span>
-      </label>
-
-      <button className="premium-btn premium-btn-navy" type="button" onClick={submit} disabled={sending} style={{ width: '100%' }}>
-        <Send size={17} /> {sending ? 'Отправляем…' : 'Отправить заявку'}
-      </button>
-
-      {message && (
-        <div className={`premium-form-message ${message.type === 'success' ? 'is-success' : ''}`}>
-          {message.text}
-          {message.type === 'error' && (
-            <div className="premium-home-actions" style={{ marginTop: 12 }}>
-              <a className="premium-btn premium-btn-ghost" href={whatsappUrl(fallbackText)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-              <a className="premium-btn premium-btn-ghost" href={TOTOSHA_CONTACTS.telUrl}>Позвонить</a>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function HomePage() {
@@ -207,7 +78,7 @@ export default function HomePage() {
             <h1>Тотоша — место, где забота стала системой</h1>
             <p>Безопасность, гармоничное развитие и понятный распорядок дня. Мы рядом с ребёнком и семьёй — открыто, бережно и каждый день.</p>
             <div className="premium-home-actions">
-              <a className="premium-btn premium-btn-navy" href={excursionWhatsapp} target="_blank" rel="noopener noreferrer" onClick={() => track('premium_hero_whatsapp')}>
+              <a className="premium-btn premium-btn-navy" href="#home-lead" onClick={() => track('premium_hero_form')}>
                 <CalendarDays size={18} /> Записаться на экскурсию
               </a>
               <a className="premium-btn premium-btn-ghost" href="#family-journey">
@@ -296,20 +167,26 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="premium-section premium-section-paper">
+      <section className="premium-section premium-section-paper" id="home-lead">
         <div className="premium-shell">
           <div className="premium-contact-section">
             <div className="premium-contact-copy">
               <div className="premium-card-kicker premium-card-kicker-light">Контакты</div>
               <h2>Будем рады познакомиться</h2>
-              <p>Основной контакт — Айшагуль Галымжановна, заведующая детским садом.</p>
+              <p>Оставьте заявку, позвоните или напишите в WhatsApp. Экскурсия не обязывает к зачислению.</p>
               <div className="premium-contact-list">
                 <a href={TOTOSHA_CONTACTS.telUrl}><span><Phone size={18} /></span>{TOTOSHA_CONTACTS.phoneDisplay}</a>
                 <a href={TOTOSHA_CONTACTS.mapUrl} target="_blank" rel="noopener noreferrer"><span><MapPin size={18} /></span>{TOTOSHA_CONTACTS.address}</a>
                 <div><span><Clock3 size={18} /></span>Пн–Пт · 07:30–19:00</div>
               </div>
             </div>
-            <PremiumLeadForm />
+            <PremiumLeadForm
+              title="Записаться на экскурсию"
+              description="Телефон в поле приведён только как пример формата. Введите свой номер."
+              defaultIntent="Записаться на экскурсию"
+              intentOptions={['Записаться на экскурсию', 'Узнать подходящую группу', 'Уточнить формат посещения', 'Получить консультацию']}
+              source="totoshakids.kz home"
+            />
           </div>
           <PremiumMap compact />
         </div>
