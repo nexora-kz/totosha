@@ -1,0 +1,81 @@
+name: Vacancies Production Audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --no-save puppeteer-core@24
+      - name: Audit production vacancies
+        run: |
+          mkdir -p audit
+          cat > audit/run.mjs <<'JS'
+          import fs from 'node:fs/promises';
+          import puppeteer from 'puppeteer-core';
+
+          const origin='https://www.totoshakids.kz';
+          const browser=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+          const pages=[];
+          for(const mode of [{name:'desktop',width:1440,height:1000,mobile:false},{name:'mobile',width:390,height:844,mobile:true}]){
+            const page=await browser.newPage();
+            await page.setCacheEnabled(false);
+            await page.setViewport({width:mode.width,height:mode.height,isMobile:mode.mobile,deviceScaleFactor:1});
+            const errors=[]; page.on('pageerror',error=>errors.push(String(error)));
+            const response=await page.goto(origin+'/vacancies?audit='+Date.now(),{waitUntil:'networkidle2',timeout:60000});
+            await new Promise(resolve=>setTimeout(resolve,700));
+            const dom=await page.evaluate(()=>({
+              header:document.querySelectorAll('.premium-header').length,
+              footer:document.querySelectorAll('.premium-footer').length,
+              cards:document.querySelectorAll('.vacancy-card').length,
+              form:document.querySelectorAll('.vacancy-application-form').length,
+              placeholder:document.querySelector('.vacancy-phone-field input')?.getAttribute('placeholder')||'',
+              width:document.documentElement.clientWidth,
+              scrollWidth:document.documentElement.scrollWidth,
+              broken:[...document.images].filter(image=>image.complete&&image.naturalWidth===0).length,
+              h1:document.querySelector('h1')?.textContent?.trim()||'',
+              menu:[...document.querySelectorAll('a')].some(link=>link.getAttribute('href')==='/vacancies')
+            }));
+            await page.screenshot({path:`audit/vacancies-${mode.name}.jpg`,type:'jpeg',quality:80,fullPage:true});
+            pages.push({mode:mode.name,status:response?.status()||0,errors,dom});
+            await page.close();
+          }
+          await browser.close();
+
+          async function json(path,options){const response=await fetch(origin+path,options);return {status:response.status,type:response.headers.get('content-type'),body:await response.json().catch(()=>null)}}
+          const publicApi=await json('/api/vacancies/public');
+          const feedJson=await json('/api/vacancies/feed?format=json');
+          const xmlResponse=await fetch(origin+'/api/vacancies/feed?format=xml');
+          const feedXml={status:xmlResponse.status,type:xmlResponse.headers.get('content-type'),text:(await xmlResponse.text()).slice(0,160)};
+          const safeApplication=await json('/api/job-applications',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({name:'Audit',phone:'+7 701 234 56 78',website:'bot'})});
+          const adminVacancies=await json('/api/vacancies/admin');
+          const recruiting=await json('/api/integrations/recruiting');
+          const report={checkedAt:new Date().toISOString(),pages,publicApi,feedJson,feedXml,safeApplication,adminVacancies,recruiting};
+          await fs.writeFile('audit/report.json',JSON.stringify(report,null,2));
+          console.log(JSON.stringify(report,null,2));
+
+          for(const item of pages){
+            if(item.status!==200||item.errors.length||!item.dom.header||!item.dom.footer||item.dom.cards<3||!item.dom.form||item.dom.placeholder!=='701 234 56 78'||item.dom.scrollWidth>item.dom.width+1||item.dom.broken||!item.dom.menu) throw new Error('Page failed: '+item.mode);
+          }
+          if(publicApi.status!==200||publicApi.body?.vacancies?.length<3) throw new Error('Public vacancies API failed');
+          if(feedJson.status!==200||feedJson.body?.vacancies?.length<3) throw new Error('JSON feed failed');
+          if(feedXml.status!==200||!String(feedXml.type).includes('application/xml')||!feedXml.text.includes('<vacancies')) throw new Error('XML feed failed');
+          if(safeApplication.status!==202||!safeApplication.body?.accepted) throw new Error('Candidate API safe test failed');
+          if(adminVacancies.status!==401||recruiting.status!==401) throw new Error('Recruiting admin API is not protected');
+          JS
+          node audit/run.mjs
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: vacancies-production-audit
+          path: audit/
+          retention-days: 7
