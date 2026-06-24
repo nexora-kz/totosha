@@ -17,7 +17,7 @@ jobs:
           node-version: '24'
       - name: Install audit browser
         run: npm install --no-save puppeteer-core@24
-      - name: Audit production photos
+      - name: Audit production photos after v085
         run: |
           mkdir -p live-audit
           cat > live-audit/run.mjs <<'JS'
@@ -45,7 +45,7 @@ jobs:
               if (type === 'image') responses.push({url:res.url(), status:res.status(), contentType:res.headers()['content-type'] || ''});
             });
 
-            const url = `${site}${route}?live_photo_audit=${Date.now()}`;
+            const url = `${site}${route}?live_photo_audit_v085=${Date.now()}`;
             const nav = await page.goto(url, {waitUntil:'networkidle2', timeout:60000});
             await new Promise(r => setTimeout(r, 2000));
 
@@ -81,7 +81,7 @@ jobs:
               return {
                 title:document.title,
                 textVersion:(document.body.innerText.match(/TOTOSHA\s+v\d+/i)||[])[0] || null,
-                htmlHasV084:document.documentElement.innerHTML.includes('v084'),
+                htmlHasV085:document.documentElement.innerHTML.includes('v085'),
                 images,
               };
             });
@@ -105,7 +105,7 @@ jobs:
 
           const life = await browser.newPage();
           await life.setCacheEnabled(false);
-          await life.goto(`${site}/life?live_photo_audit=${Date.now()}`, {waitUntil:'networkidle2', timeout:60000});
+          await life.goto(`${site}/life?live_photo_audit_v085=${Date.now()}`, {waitUntil:'networkidle2', timeout:60000});
           const lifeVersion = await life.evaluate(() => (document.body.innerText.match(/TOTOSHA\s+v\d+/i)||[])[0] || null);
           report.push({route:'/life',lifeVersion});
           await life.close();
@@ -117,6 +117,6 @@ jobs:
       - name: Upload audit artifact
         uses: actions/upload-artifact@v6
         with:
-          name: totosha-live-photo-audit
+          name: totosha-live-photo-audit-v085
           path: live-audit/
           retention-days: 7
