@@ -1,0 +1,107 @@
+name: V086 Live Audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Install browser
+        run: npm install --no-save puppeteer-core@24
+      - name: Audit Life and Privacy in production
+        run: |
+          mkdir -p audit
+          cat > audit/run.mjs <<'JS'
+          import fs from 'node:fs/promises';
+          import puppeteer from 'puppeteer-core';
+
+          const browser = await puppeteer.launch({
+            executablePath: '/usr/bin/google-chrome',
+            headless: true,
+            args: ['--no-sandbox', '--disable-dev-shm-usage'],
+          });
+          const site = 'https://www.totoshakids.kz';
+          const modes = [
+            {name:'desktop', width:1440, height:1000, mobile:false},
+            {name:'mobile', width:390, height:844, mobile:true},
+          ];
+          const report = [];
+
+          for (const mode of modes) {
+            for (const route of ['/life', '/privacy']) {
+              const page = await browser.newPage();
+              await page.setCacheEnabled(false);
+              await page.setViewport({width:mode.width,height:mode.height,isMobile:mode.mobile,deviceScaleFactor:1});
+              const failed=[]; const errors=[];
+              page.on('requestfailed', req => failed.push({url:req.url(),error:req.failure()?.errorText||''}));
+              page.on('pageerror', err => errors.push(String(err)));
+              const response = await page.goto(`${site}${route}?v086_audit=${Date.now()}`, {waitUntil:'networkidle2',timeout:60000});
+              await new Promise(r=>setTimeout(r,1200));
+
+              const before = await page.evaluate(() => ({
+                width:document.documentElement.clientWidth,
+                scrollWidth:document.documentElement.scrollWidth,
+                premiumHeader:document.querySelectorAll('.premium-header').length,
+                premiumFooter:document.querySelectorAll('.premium-footer').length,
+                oldSeo:document.querySelectorAll('.seo-page-unified').length,
+                version:(document.body.innerText.match(/TOTOSHA\s+v\d+/i)||[])[0]||null,
+                lifeCards:document.querySelectorAll('.premium-life-photo-card').length,
+                brokenImages:[...document.images].filter(img=>!img.complete||img.naturalWidth===0).map(img=>img.src),
+                h1:[...document.querySelectorAll('h1')].map(h=>(h.textContent||'').trim()),
+              }));
+
+              if (route === '/life' && mode.name === 'desktop') {
+                const firstCard = await page.$('.premium-life-photo-card');
+                if (firstCard) {
+                  await firstCard.click();
+                  await page.waitForSelector('.premium-life-lightbox', {visible:true,timeout:5000});
+                  await page.click('.premium-life-lightbox-close');
+                }
+                const more = await page.$('.premium-life-more button');
+                if (more) {
+                  await more.click();
+                  await new Promise(r=>setTimeout(r,500));
+                }
+              }
+
+              const after = await page.evaluate(() => ({
+                lifeCards:document.querySelectorAll('.premium-life-photo-card').length,
+                lightbox:document.querySelectorAll('.premium-life-lightbox').length,
+              }));
+
+              const safe = `${route.slice(1)}-${mode.name}`;
+              await page.screenshot({path:`audit/${safe}.jpg`,type:'jpeg',quality:82,fullPage:true});
+              report.push({route,mode:mode.name,status:response?.status()||null,failed,errors,before,after});
+              await page.close();
+            }
+          }
+
+          await browser.close();
+          await fs.writeFile('audit/report.json', JSON.stringify(report,null,2));
+          console.log(JSON.stringify(report,null,2));
+
+          for (const item of report) {
+            if (item.status !== 200) throw new Error(`${item.route} ${item.mode}: HTTP ${item.status}`);
+            if (!item.before.premiumHeader || !item.before.premiumFooter) throw new Error(`${item.route} ${item.mode}: premium shell missing`);
+            if (item.before.oldSeo) throw new Error(`${item.route} ${item.mode}: old page style still present`);
+            if (item.before.scrollWidth > item.before.width + 1) throw new Error(`${item.route} ${item.mode}: horizontal overflow`);
+            if (item.before.brokenImages.length) throw new Error(`${item.route} ${item.mode}: broken images`);
+            if (item.errors.length) throw new Error(`${item.route} ${item.mode}: page errors`);
+          }
+          JS
+          node audit/run.mjs
+      - name: Upload audit
+        uses: actions/upload-artifact@v6
+        with:
+          name: totosha-v086-live-audit
+          path: audit/
+          retention-days: 7
