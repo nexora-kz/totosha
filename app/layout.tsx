@@ -5,6 +5,7 @@ import './v035.css';
 import './seo.css';
 import './premium.css';
 import './premium-generated.css';
+import './life-premium.css';
 
 const premiumSerif = Cormorant_Garamond({
   subsets: ['cyrillic', 'latin'],
