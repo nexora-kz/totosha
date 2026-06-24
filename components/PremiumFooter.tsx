@@ -7,6 +7,7 @@ const footerLinks = [
   { href: '/parents', label: 'Родителям' },
   { href: '/cabinet', label: 'Технологии' },
   { href: '/life', label: 'Жизнь Тотоша' },
+  { href: '/vacancies', label: 'Вакансии' },
   { href: '/privacy', label: 'Обработка данных' },
 ] as const;
 

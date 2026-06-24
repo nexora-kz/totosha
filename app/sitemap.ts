@@ -11,6 +11,7 @@ const routes = [
   { path: '/franchise', priority: 0.75, changeFrequency: 'monthly' as const },
   { path: '/contacts', priority: 0.9, changeFrequency: 'monthly' as const },
   { path: '/life', priority: 0.7, changeFrequency: 'weekly' as const },
+  { path: '/vacancies', priority: 0.85, changeFrequency: 'daily' as const },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

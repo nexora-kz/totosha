@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Baby, CalendarDays, Menu, Phone, Sparkles, X } from 'lucide-react';
+import { Baby, BriefcaseBusiness, CalendarDays, Menu, Phone, Sparkles, X } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { TOTOSHA_CONTACTS } from '../lib/totoshaConfig';
 
@@ -12,6 +12,7 @@ const links = [
   { href: '/cabinet', label: 'Технологии' },
   { href: '/franchise', label: 'Франшиза' },
   { href: '/life', label: 'Жизнь' },
+  { href: '/vacancies', label: 'Вакансии' },
   { href: '/contacts', label: 'Контакты' },
 ] as const;
 
@@ -87,6 +88,7 @@ export function PremiumHeader() {
                 href={link.href}
                 className={pathname === link.href ? 'is-active' : undefined}
               >
+                {link.href === '/vacancies' && <BriefcaseBusiness size={16} />}
                 {link.label}
               </a>
             ))}
