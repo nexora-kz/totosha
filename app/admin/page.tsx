@@ -66,7 +66,7 @@ export default function AdminPage() {
     <main className="crm-app">
       <header className="crm-topbar">
         <div><small>Тотоша CRM</small><h1>Заявки с сайта</h1></div>
-        <div className="crm-topbar-actions"><button onClick={load}>Обновить</button><button onClick={logout}>Выйти</button></div>
+        <div className="crm-topbar-actions"><a href="/office/recruiting">Вакансии и подбор</a><button onClick={load}>Обновить</button><button onClick={logout}>Выйти</button></div>
       </header>
 
       <section className="crm-metrics">
