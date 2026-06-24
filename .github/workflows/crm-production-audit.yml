@@ -1,0 +1,60 @@
+name: CRM Production Audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Check live CRM routes
+        run: |
+          mkdir -p audit
+          cat > audit/run.mjs <<'JS'
+          import fs from 'node:fs/promises';
+
+          const origin = 'https://www.totoshakids.kz';
+          const checks = [];
+
+          async function check(path) {
+            const response = await fetch(origin + path, { redirect: 'manual' });
+            let body = null;
+            try { body = await response.json(); } catch {}
+            checks.push({ path, status: response.status, location: response.headers.get('location'), body });
+          }
+
+          await check('/office/login');
+          await check('/admin');
+          await check('/api/crm/session');
+          await check('/api/crm/leads');
+
+          const report = { checkedAt: new Date().toISOString(), checks };
+          await fs.writeFile('audit/report.json', JSON.stringify(report, null, 2));
+          console.log(JSON.stringify(report, null, 2));
+
+          const login = checks.find(item => item.path === '/office/login');
+          const admin = checks.find(item => item.path === '/admin');
+          const session = checks.find(item => item.path === '/api/crm/session');
+          const leads = checks.find(item => item.path === '/api/crm/leads');
+
+          if (login?.status !== 200) throw new Error('Login page failed');
+          if (admin?.status !== 200) throw new Error('Admin page failed');
+          if (session?.status !== 200) throw new Error('Session endpoint failed');
+          if (leads?.status !== 401) throw new Error('Leads endpoint is not protected');
+          JS
+          node audit/run.mjs
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: crm-production-audit
+          path: audit/
+          retention-days: 7
