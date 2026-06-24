@@ -1,0 +1,22 @@
+Бесплатные каналы подбора Тотоша
+
+1. Основной источник:
+https://www.totoshakids.kz/vacancies
+
+2. Enbek.kz:
+https://www.enbek.kz/
+
+3. Собственные каналы:
+Instagram Тотоша
+Telegram Тотоша
+WhatsApp-сообщества
+
+4. Карьерные центры:
+педагогические колледжи и университеты Астаны
+
+5. Универсальные бесплатные выгрузки:
+https://www.totoshakids.kz/api/vacancies/feed?format=xml
+https://www.totoshakids.kz/api/vacancies/feed?format=json
+
+Платные сервисы и hh.kz не используются.
+Kaspi Работа не подключается до официального подтверждения бесплатного размещения для работодателя.
