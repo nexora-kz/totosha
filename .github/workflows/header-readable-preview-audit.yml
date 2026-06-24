@@ -1,0 +1,104 @@
+name: Header Readable Preview Audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm install --no-save puppeteer-core@24
+      - name: Audit readable header
+        run: |
+          mkdir -p audit
+          cat > audit/run.mjs <<'JS'
+          import fs from 'node:fs/promises';
+          import puppeteer from 'puppeteer-core';
+
+          const origin='https://totosha-git-header-readable-v098-nexora-kz-s-projects.vercel.app';
+          const widths=[1897,1660,1440,1361,1360,1024,390];
+          const browser=await puppeteer.launch({executablePath:'/usr/bin/google-chrome',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+          const report=[];
+
+          for(const width of widths){
+            const page=await browser.newPage();
+            await page.setViewport({width,height:900,isMobile:width<=720,deviceScaleFactor:1});
+            await page.setCacheEnabled(false);
+            const errors=[]; page.on('pageerror',error=>errors.push(String(error)));
+            const response=await page.goto(`${origin}/?header_readable_audit=${Date.now()}`,{waitUntil:'networkidle2',timeout:60000});
+            await new Promise(resolve=>setTimeout(resolve,600));
+            const data=await page.evaluate(()=>{
+              const linksWrap=document.querySelector('.premium-links');
+              const actions=document.querySelector('.premium-header-actions');
+              const menu=document.querySelector('.premium-menu-toggle');
+              const brand=document.querySelector('.premium-brand-copy strong');
+              const links=[...document.querySelectorAll('.premium-links a')];
+              const box=e=>e?(()=>{const r=e.getBoundingClientRect();return {x:r.x,right:r.right,y:r.y,width:r.width,height:r.height}})():null;
+              return {
+                linksDisplay:linksWrap?getComputedStyle(linksWrap).display:null,
+                actionsDisplay:actions?getComputedStyle(actions).display:null,
+                menuDisplay:menu?getComputedStyle(menu).display:null,
+                brandFont:brand?parseFloat(getComputedStyle(brand).fontSize):0,
+                actions:box(actions),
+                links:links.map(link=>{
+                  const span=link.querySelector('span');
+                  const range=document.createRange();
+                  if(span) range.selectNodeContents(span);
+                  const textBox=span?range.getBoundingClientRect():link.getBoundingClientRect();
+                  return {
+                    text:(link.textContent||'').trim(),
+                    ...box(link),
+                    textHeight:textBox.height,
+                    fontSize:parseFloat(getComputedStyle(link).fontSize),
+                    whiteSpace:getComputedStyle(link).whiteSpace,
+                  };
+                }),
+                scrollWidth:document.documentElement.scrollWidth,
+                clientWidth:document.documentElement.clientWidth,
+              };
+            });
+            await page.screenshot({path:`audit/header-${width}.png`,type:'png',clip:{x:0,y:0,width,height:180}});
+            report.push({width,status:response?.status()||0,errors,data});
+            await page.close();
+          }
+
+          await browser.close();
+          await fs.writeFile('audit/report.json',JSON.stringify(report,null,2));
+          console.log(JSON.stringify(report,null,2));
+
+          for(const item of report){
+            if(item.status!==200||item.errors.length) throw new Error(`Load failed at ${item.width}`);
+            if(item.data.scrollWidth>item.data.clientWidth+1) throw new Error(`Horizontal overflow at ${item.width}`);
+            const desktop=item.width>1360;
+            if(desktop){
+              if(item.data.linksDisplay==='none'||item.data.actionsDisplay==='none'||item.data.menuDisplay!=='none') throw new Error(`Wrong desktop mode at ${item.width}`);
+              if(item.data.brandFont<29.5) throw new Error(`Brand too small at ${item.width}: ${item.data.brandFont}`);
+              for(const link of item.data.links){
+                if(link.fontSize<13.4) throw new Error(`Small menu font ${link.text} at ${item.width}: ${link.fontSize}`);
+                if(link.whiteSpace!=='nowrap'||link.textHeight>24) throw new Error(`Wrapped link ${link.text} at ${item.width}`);
+              }
+              for(let index=1;index<item.data.links.length;index++){
+                if(item.data.links[index-1].right>item.data.links[index].x+1) throw new Error(`Links overlap at ${item.width}`);
+              }
+              const last=item.data.links.at(-1);
+              if(last&&item.data.actions&&last.right>item.data.actions.x-4) throw new Error(`Navigation overlaps actions at ${item.width}`);
+            }else{
+              if(item.data.linksDisplay!=='none'||item.data.actionsDisplay!=='none'||item.data.menuDisplay==='none') throw new Error(`Wrong compact mode at ${item.width}`);
+            }
+          }
+          JS
+          node audit/run.mjs
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: header-readable-preview-audit
+          path: audit/
+          retention-days: 7
