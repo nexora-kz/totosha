@@ -12,7 +12,7 @@ export type TotoshaVacancy = {
   salaryFrom?: number | null;
   salaryTo?: number | null;
   currency?: string;
-  source: 'totosha' | 'hh';
+  source: 'totosha';
   externalUrl?: string | null;
   externalId?: string | null;
   publishedAt?: string | null;

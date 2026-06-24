@@ -84,7 +84,7 @@ export function JobApplicationForm({ vacancies, initialVacancyId }: Props) {
       <div className="vacancy-form-heading">
         <small>Анкета кандидата</small>
         <h2>Откликнуться в Тотоша</h2>
-        <p>Достаточно заполнить одну форму. Ссылка на резюме hh.kz или другого сервиса необязательна.</p>
+        <p>Достаточно заполнить одну форму. Ссылка на резюме в Google Drive или другом бесплатном хранилище необязательна.</p>
       </div>
 
       <div className="vacancy-form-grid">
@@ -109,7 +109,7 @@ export function JobApplicationForm({ vacancies, initialVacancyId }: Props) {
         </label>
         <label className="vacancy-form-wide">
           <span>Ссылка на резюме</span>
-          <input value={resumeUrl} onChange={(event) => setResumeUrl(event.target.value)} placeholder="hh.kz, Google Drive или другой сервис" inputMode="url" />
+          <input value={resumeUrl} onChange={(event) => setResumeUrl(event.target.value)} placeholder="Google Drive, OneDrive или другое бесплатное хранилище" inputMode="url" />
         </label>
         <label className="vacancy-form-wide">
           <span>Комментарий</span>
