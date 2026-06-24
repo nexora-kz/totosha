@@ -1,0 +1,120 @@
+name: Public Route Audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Install browser
+        run: npm install --no-save puppeteer-core@24
+      - name: Crawl public pages
+        run: |
+          mkdir -p audit
+          cat > audit/run.mjs <<'JS'
+          import fs from 'node:fs/promises';
+          import puppeteer from 'puppeteer-core';
+
+          const origin = 'https://www.totoshakids.kz';
+          const browser = await puppeteer.launch({
+            executablePath: '/usr/bin/google-chrome',
+            headless: true,
+            args: ['--no-sandbox', '--disable-dev-shm-usage'],
+          });
+          const queue = ['/', '/about', '/programs', '/parents', '/cabinet', '/franchise', '/contacts', '/life', '/privacy'];
+          const visited = new Set();
+          const results = [];
+
+          function normalize(raw) {
+            try {
+              const url = new URL(raw, origin);
+              if (url.origin !== origin) return null;
+              if (!['http:', 'https:'].includes(url.protocol)) return null;
+              if (/\.(jpg|jpeg|png|webp|svg|ico|pdf|zip|xml|txt)$/i.test(url.pathname)) return null;
+              if (url.pathname.startsWith('/_next/')) return null;
+              return url.pathname.replace(/\/$/, '') || '/';
+            } catch {
+              return null;
+            }
+          }
+
+          while (queue.length && visited.size < 80) {
+            const route = queue.shift();
+            if (!route || visited.has(route)) continue;
+            visited.add(route);
+
+            const page = await browser.newPage();
+            await page.setCacheEnabled(false);
+            await page.setViewport({width: 1440, height: 1000, deviceScaleFactor: 1});
+            const errors = [];
+            page.on('pageerror', error => errors.push(String(error)));
+
+            let response = null;
+            try {
+              response = await page.goto(`${origin}${route}?route_audit=${Date.now()}`, {waitUntil:'networkidle2', timeout:60000});
+            } catch (error) {
+              results.push({route, status:null, navigationError:String(error)});
+              await page.close();
+              continue;
+            }
+
+            const data = await page.evaluate(() => {
+              const links = [...document.querySelectorAll('a[href]')].map(anchor => anchor.getAttribute('href')).filter(Boolean);
+              const bodyClass = document.body.className;
+              return {
+                title: document.title,
+                h1: [...document.querySelectorAll('h1')].map(el => (el.textContent || '').trim()),
+                links,
+                premiumSite: document.querySelectorAll('.premium-site').length,
+                premiumHeader: document.querySelectorAll('.premium-header').length,
+                premiumFooter: document.querySelectorAll('.premium-footer').length,
+                oldHeader: document.querySelectorAll('.header:not(.premium-header), .seo-unified-header').length,
+                oldClasses: document.querySelectorAll('.seo-page-unified, .seo-landing, .life-page, .site-shell, .legacy-page').length,
+                bodyClass,
+                width: document.documentElement.clientWidth,
+                scrollWidth: document.documentElement.scrollWidth,
+                version: (document.body.innerText.match(/TOTOSHA\s+v\d+/i) || [])[0] || null,
+              };
+            });
+
+            for (const href of data.links) {
+              const next = normalize(href);
+              if (next && !visited.has(next) && !queue.includes(next)) queue.push(next);
+            }
+
+            results.push({
+              route,
+              status: response?.status() || null,
+              finalUrl: page.url(),
+              errors,
+              ...data,
+            });
+            await page.close();
+          }
+
+          await browser.close();
+          const oldPages = results.filter(item => item.status === 200 && (!item.premiumSite || !item.premiumHeader || !item.premiumFooter || item.oldHeader || item.oldClasses));
+          const brokenPages = results.filter(item => item.status && item.status >= 400);
+          await fs.writeFile('audit/routes.json', JSON.stringify(results, null, 2));
+          await fs.writeFile('audit/summary.json', JSON.stringify({oldPages, brokenPages}, null, 2));
+          console.log('ROUTES', JSON.stringify(results.map(item => ({route:item.route,status:item.status,premiumSite:item.premiumSite,header:item.premiumHeader,footer:item.premiumFooter,oldHeader:item.oldHeader,oldClasses:item.oldClasses,h1:item.h1}))));
+          console.log('OLD_PAGES', JSON.stringify(oldPages.map(item => item.route)));
+          console.log('BROKEN_PAGES', JSON.stringify(brokenPages.map(item => ({route:item.route,status:item.status}))));
+          JS
+          node audit/run.mjs
+      - name: Upload audit
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: totosha-public-route-audit
+          path: audit/
+          retention-days: 7
