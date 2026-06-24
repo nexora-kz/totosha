@@ -1,0 +1,122 @@
+name: Live Photo Audit
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - name: Install audit browser
+        run: npm install --no-save puppeteer-core@24
+      - name: Audit production photos
+        run: |
+          mkdir -p live-audit
+          cat > live-audit/run.mjs <<'JS'
+          import fs from 'node:fs/promises';
+          import puppeteer from 'puppeteer-core';
+
+          const site = 'https://www.totoshakids.kz';
+          const routes = ['/', '/about', '/programs', '/parents'];
+          const browser = await puppeteer.launch({
+            executablePath: '/usr/bin/google-chrome',
+            headless: true,
+            args: ['--no-sandbox', '--disable-dev-shm-usage'],
+          });
+          const report = [];
+
+          for (const route of routes) {
+            const page = await browser.newPage();
+            await page.setCacheEnabled(false);
+            await page.setViewport({width: 1440, height: 1000, deviceScaleFactor: 1});
+            const failed = [];
+            const responses = [];
+            page.on('requestfailed', req => failed.push({url:req.url(), error:req.failure()?.errorText || ''}));
+            page.on('response', res => {
+              const type = res.request().resourceType();
+              if (type === 'image') responses.push({url:res.url(), status:res.status(), contentType:res.headers()['content-type'] || ''});
+            });
+
+            const url = `${site}${route}?live_photo_audit=${Date.now()}`;
+            const nav = await page.goto(url, {waitUntil:'networkidle2', timeout:60000});
+            await new Promise(r => setTimeout(r, 2000));
+
+            const details = await page.evaluate(() => {
+              const css = el => {
+                const c = getComputedStyle(el);
+                return {
+                  display:c.display,
+                  visibility:c.visibility,
+                  opacity:c.opacity,
+                  objectFit:c.objectFit,
+                  objectPosition:c.objectPosition,
+                  width:c.width,
+                  height:c.height,
+                };
+              };
+              const rect = el => {
+                const r=el.getBoundingClientRect();
+                return {x:r.x,y:r.y,width:r.width,height:r.height,right:r.right,bottom:r.bottom};
+              };
+              const images = [...document.images].map((img,index)=>({
+                index,
+                alt:img.alt,
+                src:img.src,
+                currentSrc:img.currentSrc,
+                complete:img.complete,
+                naturalWidth:img.naturalWidth,
+                naturalHeight:img.naturalHeight,
+                rect:rect(img),
+                css:css(img),
+                parentClass:img.parentElement?.className || '',
+              }));
+              return {
+                title:document.title,
+                textVersion:(document.body.innerText.match(/TOTOSHA\s+v\d+/i)||[])[0] || null,
+                htmlHasV084:document.documentElement.innerHTML.includes('v084'),
+                images,
+              };
+            });
+
+            const safe = route === '/' ? 'home' : route.slice(1);
+            await page.screenshot({path:`live-audit/${safe}-full.jpg`,type:'jpeg',quality:85,fullPage:true});
+
+            const selectors = route === '/' ? ['.premium-journey-photo img', '.premium-life-photo img'] : ['.premium-photo-frame img'];
+            let shotIndex = 0;
+            for (const selector of selectors) {
+              const handles = await page.$$(selector);
+              for (const handle of handles) {
+                await handle.screenshot({path:`live-audit/${safe}-photo-${shotIndex}.png`});
+                shotIndex += 1;
+              }
+            }
+
+            report.push({route,url,status:nav?.status()||null,failed,responses,details});
+            await page.close();
+          }
+
+          const life = await browser.newPage();
+          await life.setCacheEnabled(false);
+          await life.goto(`${site}/life?live_photo_audit=${Date.now()}`, {waitUntil:'networkidle2', timeout:60000});
+          const lifeVersion = await life.evaluate(() => (document.body.innerText.match(/TOTOSHA\s+v\d+/i)||[])[0] || null);
+          report.push({route:'/life',lifeVersion});
+          await life.close();
+          await browser.close();
+          await fs.writeFile('live-audit/report.json', JSON.stringify(report,null,2));
+          console.log(JSON.stringify(report,null,2));
+          JS
+          node live-audit/run.mjs
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: totosha-live-photo-audit
+          path: live-audit/
+          retention-days: 7
