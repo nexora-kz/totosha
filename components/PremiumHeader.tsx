@@ -11,6 +11,7 @@ const links = [
   { href: '/parents', label: 'Родителям' },
   { href: '/cabinet', label: 'Технологии' },
   { href: '/franchise', label: 'Франшиза' },
+  { href: '/life', label: 'Жизнь' },
   { href: '/contacts', label: 'Контакты' },
 ] as const;
 
