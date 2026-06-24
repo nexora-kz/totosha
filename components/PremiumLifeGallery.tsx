@@ -133,11 +133,12 @@ export function PremiumLifeGallery({
                   key={item.id}
                   onClick={() => setSelected(item)}
                   aria-label={`Открыть фотографию: ${item.event}`}
+                  style={{ contentVisibility: 'visible' }}
                 >
                   <img
                     src={item.src}
                     alt={item.event}
-                    loading={index < 4 ? 'eager' : 'lazy'}
+                    loading="eager"
                     decoding="async"
                     draggable={false}
                   />
