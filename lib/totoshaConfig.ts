@@ -3,9 +3,9 @@ import aboutHero from '../public/totosha-media/2024/8_Марта_2024/058_photo_
 import programsHero from '../public/totosha-media/2024/Повседневная_жизнь/083_photo_1044@03-05-2024_11-55-55.jpg';
 import parentsHero from '../public/totosha-media/2026/8_Марта_2026/118_photo_1808@05-03-2026_16-23-19.jpg';
 
-export const TOTOSHA_VERSION = 'v095';
+export const TOTOSHA_VERSION = 'v096';
 export const TOTOSHA_BUILD_DATE = '2026-06-24';
-export const TOTOSHA_DEPLOY_LABEL = 'Vacancies and Recruiting Integrations v095';
+export const TOTOSHA_DEPLOY_LABEL = 'Free Recruiting Only v096';
 
 const mapQuery = encodeURIComponent('Тотоша, Астана, улица Алихана Бокейхана, 29А');
 
