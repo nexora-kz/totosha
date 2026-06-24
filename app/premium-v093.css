@@ -7,3 +7,7 @@
   cursor: wait;
   opacity: 0.64;
 }
+
+.premium-honeypot {
+  display: none;
+}
