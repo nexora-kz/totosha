@@ -1,10 +1,11 @@
-import homeHero from '../public/totosha-premium/home-hero.jpg';
-import programsHero from '../public/totosha-premium/programs-hero.jpg';
-import parentsHero from '../public/totosha-premium/parents-hero.jpg';
+import homeHero from '../public/totosha-media/2025/Осенние_события_2025/102_photo_1452@31-10-2025_14-29-07.jpg';
+import aboutHero from '../public/totosha-media/2024/8_Марта_2024/058_photo_991@05-03-2024_13-19-07.jpg';
+import programsHero from '../public/totosha-media/2024/Повседневная_жизнь/083_photo_1044@03-05-2024_11-55-55.jpg';
+import parentsHero from '../public/totosha-media/2026/8_Марта_2026/118_photo_1808@05-03-2026_16-23-19.jpg';
 
-export const TOTOSHA_VERSION = 'v083';
-export const TOTOSHA_BUILD_DATE = '2026-06-23';
-export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v083';
+export const TOTOSHA_VERSION = 'v084';
+export const TOTOSHA_BUILD_DATE = '2026-06-24';
+export const TOTOSHA_DEPLOY_LABEL = 'Premium Production v084';
 
 const mapQuery = encodeURIComponent('Тотоша, Астана, улица Алихана Бокейхана, 29А');
 
@@ -27,36 +28,36 @@ export const TOTOSHA_CONTACTS = {
 export const PREMIUM_VISUALS = {
   home: {
     src: homeHero.src,
-    alt: 'Счастливые дети на празднике в детском саду Тотоша',
+    alt: 'Атмосфера Тотоша',
   },
   about: {
-    src: homeHero.src,
-    alt: 'Тёплая атмосфера и забота в детском саду Тотоша',
+    src: aboutHero.src,
+    alt: 'Жизнь Тотоша',
   },
   programs: {
     src: programsHero.src,
-    alt: 'Дети участвуют в развивающих занятиях Тотоша',
+    alt: 'Занятия в Тотоша',
   },
   parents: {
     src: parentsHero.src,
-    alt: 'Радостные дети в спокойной атмосфере детского сада Тотоша',
+    alt: 'Семейная атмосфера Тотоша',
   },
 } as const;
 
 export const HOME_GALLERY = [
   {
     src: PREMIUM_VISUALS.home.src,
-    alt: 'Новый год в Тотоша',
+    alt: 'Осенний праздник в Тотоша',
     title: 'Праздники',
   },
   {
     src: PREMIUM_VISUALS.programs.src,
-    alt: 'Праздник в детском саду Тотоша',
-    title: 'Мероприятия',
+    alt: 'Творческое занятие в Тотоша',
+    title: 'Развитие',
   },
   {
     src: PREMIUM_VISUALS.parents.src,
-    alt: 'Жизнь детского сада Тотоша',
-    title: 'Атмосфера',
+    alt: 'Атмосфера Тотоша',
+    title: 'Забота',
   },
 ] as const;
