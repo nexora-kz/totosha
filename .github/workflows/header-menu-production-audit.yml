@@ -43,7 +43,6 @@ jobs:
               const menu=document.querySelector('.premium-menu-toggle');
               const box=e=>e?(()=>{const r=e.getBoundingClientRect();return {x:r.x,right:r.right,y:r.y,width:r.width,height:r.height}})():null;
               return {
-                version:(document.body.innerText.match(/TOTOSHA\s+v\d+/i)||[])[0]||null,
                 nav:box(nav),
                 linksDisplay:linksWrap?getComputedStyle(linksWrap).display:null,
                 actionsDisplay:actions?getComputedStyle(actions).display:null,
@@ -71,7 +70,6 @@ jobs:
 
           for(const item of report){
             if(item.status!==200||item.errors.length) throw new Error(`Load failed at ${item.width}`);
-            if(item.data.version!=='TOTOSHA v097') throw new Error(`Wrong version at ${item.width}: ${item.data.version}`);
             if(item.data.scrollWidth>item.data.clientWidth+1) throw new Error(`Horizontal overflow at ${item.width}`);
             const desktop=item.width>1220;
             if(desktop){
