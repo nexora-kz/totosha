@@ -1,0 +1,9 @@
+.premium-site {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+.premium-btn:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
