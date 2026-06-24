@@ -1,1 +1,1 @@
-.premium-map-card{margin-top:28px;border-radius:32px;background:#fffdf8}
+.premium-map-card{margin-top:28px;overflow:hidden;border:1px solid #e1cfaa;border-radius:32px;background:#fffdf8}.premium-map-head{display:flex;justify-content:space-between;gap:20px;padding:24px}.premium-map-title{display:flex;gap:12px}.premium-map-actions{display:flex;gap:10px;flex-wrap:wrap}.premium-map-action{padding:12px 14px;border:1px solid #d8c49e;border-radius:14px;color:#0d1b3a;text-decoration:none}.premium-map-action.primary{color:#fff;background:#0d1b3a}
