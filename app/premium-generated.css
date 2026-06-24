@@ -3,32 +3,35 @@
 .premium-visual-programs .premium-photo-frame,
 .premium-visual-parents .premium-photo-frame {
   background-color: #efe4cf;
-  background-image: url('/generated/hero?v=079');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background-image: none;
 }
 
 .premium-journey-photo img,
 .premium-visual-about .premium-photo-frame img,
 .premium-visual-programs .premium-photo-frame img,
 .premium-visual-parents .premium-photo-frame img {
-  opacity: 0;
+  position: relative;
+  z-index: 1;
+  display: block;
+  opacity: 1 !important;
 }
 
-.premium-visual-about .premium-photo-frame {
-  background-position: center 28%;
+.premium-journey-photo img {
+  object-position: center 38%;
 }
 
-.premium-visual-programs .premium-photo-frame {
-  background-position: center 38%;
+.premium-visual-about .premium-photo-frame img {
+  object-position: center 34%;
 }
 
-.premium-visual-parents .premium-photo-frame {
-  background-position: center 32%;
+.premium-visual-programs .premium-photo-frame img {
+  object-position: center 36%;
 }
 
-/* The old photo badges were being covered by the foreground cards and looked like hidden text. */
+.premium-visual-parents .premium-photo-frame img {
+  object-position: center 32%;
+}
+
 .premium-visual-about .premium-photo-badge,
 .premium-visual-programs .premium-photo-badge,
 .premium-visual-parents .premium-photo-badge {
