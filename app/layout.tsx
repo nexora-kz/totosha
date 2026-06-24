@@ -74,6 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <a href="/franchise">Франшиза</a>
           <a href="/contacts">Контакты</a>
           <a href="/life">Жизнь Тотоша</a>
+          <a href="/vacancies">Вакансии</a>
         </nav>
         <script
           id="totosha-json-ld"
